@@ -14,7 +14,7 @@ A tool for managing marketing campaigns
 
 - **Library**: React
 - **Language**: TypeScript
-- **Framework**: React Router
+- **Framework**: React Router v7
   - Next.js framework is considered, but may not be required for this project (SSR is necessary)
 - **Styling**: Tailwind CSS (+ shadcn/ui library)
 - **State** Management: Redux

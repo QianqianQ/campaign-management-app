@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./backend:/app  # Mounts local backend folder for development
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=backend.settings
+    # command: python manage.py runserver 0.0.0.0:8000
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend:/app  # # Mounts local frontend folder for development
+      - /app/node_modules  # Prevent from mounting node_modules from host
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    # command: npm run dev
