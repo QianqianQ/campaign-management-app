@@ -1,0 +1,12 @@
+# environment
+.venv/
+
+# python
+__pycache__/
+*.pyc
+
+# db
+db.sqlite3
+
+# vscode
+.vscode/

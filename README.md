@@ -26,8 +26,8 @@ A tool for managing marketing campaigns
 
 ### Backend
 
-- **Framework**: Django
-- **Language**: Python
+- **Framework**: Django 5.2.1 (Python 3.10+)
+- **Language**: Python 3.12
 - **API**: RestAPI (Django Rest Framework)
 - **ORM**: Django ORM
 
