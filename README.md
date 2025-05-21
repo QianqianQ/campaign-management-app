@@ -31,6 +31,10 @@ A tool for managing marketing campaigns
 ### Backend
 
 - **Framework**: Django 5.2.1 (Python 3.10+)
+  - No async support is required for this project, so FastAPI is not necessary
+  - Flask is also a good choice for this project. It is more lightweight and has a smaller footprint
+  - Django is a good choice for this project because it is a full-stack framework that includes a built-in ORM, a built-in admin interface, and a built-in authentication system
+  - While Django is mentioned in the job ad, and personally I'd like to enhance my skills in Django from scratch, and thus I'd like to use Django for this project
 - **Language**: Python 3.12
 - **API**: RestAPI (Django Rest Framework)
 - **ORM**: Django ORM

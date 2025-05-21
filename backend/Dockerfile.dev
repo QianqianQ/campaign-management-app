@@ -1,0 +1,31 @@
+FROM python:3.12-slim
+
+# Set environment variables to optimize Python
+# Prevents Python from writing pyc files to disk
+ENV PYTHONDONTWRITEBYTECODE=1
+# Prevents Python from buffering stdout and stderr
+ENV PYTHONUNBUFFERED=1
+
+# Create the app directory
+RUN mkdir /app
+
+# Set the working directory
+WORKDIR /app
+
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Copy the requirements file first (better caching)
+COPY requirements.txt /app/
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy project
+COPY . /app/
+
+# Expose port
+EXPOSE 8000
+
+# Run Django server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
