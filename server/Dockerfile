@@ -39,6 +39,9 @@ WORKDIR /app
 # Copy application code
 COPY --chown=appuser:appuser . .
 
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
 # Set environment variables to optimize Python
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -46,8 +49,10 @@ ENV PYTHONUNBUFFERED=1
 # Switch to non-root user
 USER appuser
 
+RUN chmod +x docker-entrypoint.sh
+
 # Expose the application port
 EXPOSE 8000
 
 # Start the application using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "server.wsgi:application"]
+ENTRYPOINT ["./docker-entrypoint.sh"]

@@ -5,9 +5,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    environment:
-      - DEBUG=0
-      - DJANGO_SETTINGS_MODULE=server.settings
+    depends_on:
+      - db
+    env_file:
+      - .env
+    networks:
+      - app-network
     restart: unless-stopped
 
   client:
@@ -16,6 +19,28 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
+    env_file:
+      - .env
+    networks:
+      - app-network
     restart: unless-stopped
+
+  db:
+    image: postgres:17
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

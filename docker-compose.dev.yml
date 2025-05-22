@@ -7,10 +7,13 @@ services:
       - ./server:/app  # Mounts local backend folder for development
     ports:
       - "8000:8000"
-    environment:
-      - DEBUG=1
-      - DJANGO_SETTINGS_MODULE=server.settings
-    # command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+    env_file:
+      - .env.dev
+    networks:
+      - app-network
+    restart: unless-stopped
 
   client:
     build:
@@ -21,6 +24,29 @@ services:
       - /app/node_modules  # Prevent from mounting node_modules from host
     ports:
       - "5173:5173"
-    environment:
-      - NODE_ENV=development
     # command: npm run dev
+    env_file:
+      - .env.dev
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  db:
+    image: postgres:17
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env.dev
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
