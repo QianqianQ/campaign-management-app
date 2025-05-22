@@ -6,3 +6,4 @@ django-filter==25.1  # Filtering support
 gunicorn==23.0.0  # Production server
 psycopg2-binary==2.9.10  # database
 python-dotenv==1.1.0  # Environment variables
+django-cors-headers==4.7.0  # CORS support

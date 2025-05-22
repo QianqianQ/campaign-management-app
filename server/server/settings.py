@@ -48,6 +48,7 @@ SECRET_KEY = 'django-insecure-@@92jd8*a!$q&7=6mr0l-ep1wdcn&=954-52wakp-!6a8ry_k_
 DEBUG = True  # Temporarily set to True for development
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+CORS_ALLOW_ALL_ORIGINS = True  # TODO: Remove in production
 
 # Application definition
 
@@ -59,9 +60,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
+    'api'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
