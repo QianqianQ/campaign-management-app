@@ -21,18 +21,17 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile.dev
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}  # This pulls from .env file or env var settings
     volumes:
-      - ./client:/app
-      # Exclude specific folders from being mounted
-      - /app/node_modules
-      - /app/.react-router
-      - /app/.vite
-      - /app/dist
+      - ./client:/app  # Mounts local frontend folder for development
+      - /app/node_modules  # Prevents overwriting node_modules for development
+      - /app/.next  # Prevents overwriting next.js build for development
     ports:
-      - "5173:5173"
+      - "3000:3000"
     # command: npm run dev
     env_file:
-      - ./client/.env
+      - ./client/.env.local
     networks:
       - app-network
     restart: unless-stopped

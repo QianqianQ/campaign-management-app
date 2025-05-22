@@ -14,17 +14,13 @@ A tool for managing marketing campaigns
 
 - **Library**: React
 - **Language**: TypeScript
-- **Framework**: React Router v7
-  - Next.js framework is considered, but may not be required for this project (SSR is necessary)
+- **Framework**: Next.js
 - **Styling**: Tailwind CSS (+ shadcn/ui library)
 - **State** Management: Redux
 - **Routing**: React Router
 - **API**: Axios
 - **Form Handling**: react-hook-form
 - **Validation**: zod
-- **Build Tool**: Vite
-  - For this small app rapid development and build speed is more important, so Vite might be enough
-  - For a larger app, Webpack might be a good choice
 - **Package Manager**: npm
 
 
