@@ -17,6 +17,26 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables
+load_dotenv(BASE_DIR / '.env')
+
+# Determine which database environment to use (local | docker | remote)
+DB_HOST_TYPE = os.environ.get('DB_HOST_TYPE', 'local')
+if DB_HOST_TYPE == 'remote':
+    # Load overrides for remote db
+    override = BASE_DIR / '.env.override'
+    if override.exists():
+        load_dotenv(dotenv_path=override, override=True)
+
+print("\nEnvironment Variables:")
+print(f"DEBUG: {os.getenv('DEBUG')}")
+print(f"POSTGRES_DB: {os.getenv('POSTGRES_DB')}")
+print(f"POSTGRES_USER: {os.getenv('POSTGRES_USER')}")
+print(f"POSTGRES_PASSWORD: {'*' * 8 if os.getenv('POSTGRES_PASSWORD') else None}")
+print(f"POSTGRES_HOST: {os.getenv('POSTGRES_HOST')}")
+print(f"POSTGRES_PORT: {os.getenv('POSTGRES_PORT')}")
+print(f"DJANGO_SECRET_KEY: {'*' * 8 if os.getenv('DJANGO_SECRET_KEY') else None}")
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -28,19 +48,6 @@ SECRET_KEY = 'django-insecure-@@92jd8*a!$q&7=6mr0l-ep1wdcn&=954-52wakp-!6a8ry_k_
 DEBUG = True  # Temporarily set to True for development
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
-
-# Print environment variables for debugging
-load_dotenv()
-
-print("\nEnvironment Variables:")
-print(f"DEBUG: {os.getenv('DEBUG')}")
-print(f"POSTGRES_DB: {os.getenv('POSTGRES_DB')}")
-print(f"POSTGRES_USER: {os.getenv('POSTGRES_USER')}")
-print(f"POSTGRES_PASSWORD: {'*' * 8 if os.getenv('POSTGRES_PASSWORD') else None}")
-print(f"POSTGRES_HOST: {os.getenv('POSTGRES_HOST')}")
-print(f"POSTGRES_PORT: {os.getenv('POSTGRES_PORT')}")
-print(f"DJANGO_SECRET_KEY: {'*' * 8 if os.getenv('DJANGO_SECRET_KEY') else None}")
-print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 
 # Application definition
 
@@ -93,10 +100,22 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB', 'app_db'),
         'USER': os.getenv('POSTGRES_USER', 'postgres'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
-        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
         'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        'OPTIONS': {
+            'sslmode': 'require' if DB_HOST_TYPE == 'remote' else 'prefer',
+        },
     }
 }
+
+# Set the HOST based on the db host type
+if DB_HOST_TYPE == 'local':
+    DATABASES['default']['HOST'] = 'localhost'
+elif DB_HOST_TYPE == 'docker':
+    DATABASES['default']['HOST'] = 'db'  # This should match your service name in docker-compose
+elif DB_HOST_TYPE == 'remote':
+    DATABASES['default']['HOST'] = os.environ.get('POSTGRES_HOST')
+else:
+    raise Exception(f"Unknown DB_HOST_TYPE: {DB_HOST_TYPE}")
 
 
 # Password validation

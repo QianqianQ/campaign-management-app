@@ -43,6 +43,9 @@ A tool for managing marketing campaigns
 ### Database
 
 - PostgreSQL
+  - Local development: Dockerized PostgreSQL in Docker Compose
+  - Production: Render PostgreSQL free plan: 1 GB storage, 256 MB RAM, 0.1 CPU
+  - Switch between them with environment variables
 - Caching: Redis
 
 

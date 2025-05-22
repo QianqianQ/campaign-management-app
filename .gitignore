@@ -16,3 +16,6 @@ db.sqlite3
 
 # test
 .pytest_cache/
+
+# env
+.env.override

@@ -3,12 +3,13 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
+    environment:
+      - DB_HOST_TYPE=remote # Use remote db for production
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     env_file:
-      - .env
+      - ./server/.env
+      - ./server/.env.override
     networks:
       - app-network
     restart: unless-stopped
@@ -20,20 +21,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - .env
-    networks:
-      - app-network
-    restart: unless-stopped
-
-  db:
-    image: postgres:17
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./db/init:/docker-entrypoint-initdb.d
-    ports:
-      - "5432:5432"
-    env_file:
-      - .env
+      - ./client/.env
     networks:
       - app-network
     restart: unless-stopped
@@ -51,12 +39,7 @@ services:
       - client
     networks:
       - app-network
-    env_file:
-      - .env
 
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  postgres_data:
