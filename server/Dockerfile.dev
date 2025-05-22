@@ -16,10 +16,11 @@ WORKDIR /app
 RUN pip install --upgrade pip
 
 # Copy the requirements file first (better caching)
-COPY requirements.txt /app/
+COPY requirements.txt requirements-dev.txt /app/
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements-dev.txt
 
 # Copy project
 COPY . /app/

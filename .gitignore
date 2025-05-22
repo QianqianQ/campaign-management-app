@@ -13,3 +13,6 @@ db.sqlite3
 
 # vscode
 .vscode/
+
+# test
+.pytest_cache/
