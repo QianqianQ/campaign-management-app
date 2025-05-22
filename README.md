@@ -62,5 +62,5 @@ A tool for managing marketing campaigns
 
 ### Testing
 
-- **Backend**: Unit Testing (pytest/unittest), E2E Testing (Playwright/Selenium)
-- **Frontend**: Unit Testing (Jest), Integration Testing, E2E Testing (Cypress)
+- **Backend**: Unit Testing (pytest), Integration Testing (pytest-django, DB Testing, etc), API Testing (pytest-django)
+- **Frontend**: Unit Testing (Jest/Vitest), Integration Testing, Integration/E2E Testing (Cypress/Playwright)
