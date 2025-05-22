@@ -20,8 +20,12 @@ services:
       context: ./client
       dockerfile: Dockerfile.dev
     volumes:
-      - ./client:/app  # Mounts local frontend folder for development
-      - /app/node_modules  # Prevent from mounting node_modules from host
+      - ./client:/app
+      # Exclude specific folders from being mounted
+      - /app/node_modules
+      - /app/.react-router
+      - /app/.vite
+      - /app/dist
     ports:
       - "5173:5173"
     # command: npm run dev
@@ -65,3 +69,4 @@ networks:
 
 volumes:
   postgres_data:
+  client_node_modules:
