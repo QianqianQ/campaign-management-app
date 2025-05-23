@@ -1,0 +1,21 @@
+# environment
+.venv/
+
+# python
+__pycache__/
+*.pyc
+
+# node
+node_modules/
+
+# db
+db.sqlite3
+
+# vscode
+.vscode/
+
+# test
+.pytest_cache/
+
+# env
+.env.override

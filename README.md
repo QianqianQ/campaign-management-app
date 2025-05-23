@@ -12,22 +12,26 @@ A tool for managing marketing campaigns
 
 ### Frontend
 
-- **Framework**: React
+- **Library**: React
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui library
+- **Framework**: Next.js
+- **Styling**: Tailwind CSS (+ shadcn/ui library)
 - **State** Management: Redux
 - **Routing**: React Router
 - **API**: Axios
 - **Form Handling**: react-hook-form
 - **Validation**: zod
-- **Build Tool**: Vite
 - **Package Manager**: npm
 
 
 ### Backend
 
-- **Framework**: Django
-- **Language**: Python
+- **Framework**: Django 5.2.1 (Python 3.10+)
+  - No async support is required for this project, so FastAPI is not necessary
+  - Flask is also a good choice for this project. It is more lightweight and has a smaller footprint
+  - Django is a good choice for this project because it is a full-stack framework that includes a built-in ORM, a built-in admin interface, and a built-in authentication system
+  - While Django is mentioned in the job ad, and personally I'd like to enhance my skills in Django from scratch, and thus I'd like to use Django for this project
+- **Language**: Python 3.12
 - **API**: RestAPI (Django Rest Framework)
 - **ORM**: Django ORM
 
@@ -35,6 +39,9 @@ A tool for managing marketing campaigns
 ### Database
 
 - PostgreSQL
+  - Local development: Dockerized PostgreSQL in Docker Compose
+  - Production: Render PostgreSQL free plan: 1 GB storage, 256 MB RAM, 0.1 CPU
+  - Switch between them with environment variables
 - Caching: Redis
 
 
@@ -54,5 +61,5 @@ A tool for managing marketing campaigns
 
 ### Testing
 
-- **Backend**: Unit Testing (pytest/unittest), E2E Testing (Playwright/Selenium)
-- **Frontend**: Unit Testing (Jest), Integration Testing, E2E Testing (Cypress)
+- **Backend**: Unit Testing (pytest), Integration Testing (pytest-django, DB Testing, etc), API Testing (pytest-django)
+- **Frontend**: Unit Testing (Jest/Vitest), Integration Testing, Integration/E2E Testing (Cypress/Playwright)
