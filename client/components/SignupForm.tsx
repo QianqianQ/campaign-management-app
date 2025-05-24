@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import api from "@/services/api";
+
 const signupSchema = z.object({
   email: z
     .string()
@@ -15,13 +17,17 @@ const signupSchema = z.object({
     .email("Invalid email address"),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters"),
-  confirmPassword: z
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
+  password_confirm: z
     .string()
     .min(1, "Confirm password is required")
-}).refine((data) => data.password === data.confirmPassword, {
+}).refine((data) => data.password === data.password_confirm, {
   message: "Passwords don't match",
-  path: ["confirmPassword"]
+  path: ["password_confirm"]
 })
 
 // Infer the type of the form data from the schema
@@ -34,7 +40,19 @@ export default function SignupForm() {
 
   const onSubmit = (data: SignupFormData) => {
     console.log(data);
-    // TODO: Handle signup
+    signUp(data);
+  }
+
+  const signUp = async (data: SignupFormData) => {
+    try {
+      const response = await api.post("/signup/", data);
+      console.log(response, response.status);
+    } catch (error: any) {
+      if (error.response) {
+        console.log(error.response);
+      }
+      console.error("Error signing up:", error);
+    }
   }
 
   return (
@@ -72,13 +90,13 @@ export default function SignupForm() {
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm password</Label>
               <Input
-                id="confirmPassword"
+                id="password_confirm"
                 type="password"
                 placeholder="Confirm your password"
-                {...register("confirmPassword")}
+                {...register("password_confirm")}
               />
-              {errors.confirmPassword && (
-                <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+              {errors.password_confirm && (
+                <p className="text-sm text-red-500">{errors.password_confirm.message}</p>
               )}
             </div>
             <Button type="submit" className="w-full">

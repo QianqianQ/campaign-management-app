@@ -20,7 +20,13 @@ class AccountCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ("email", "username", "password", "password_confirm")
+        fields = ("email", "password", "password_confirm")
+
+    def validate_email(self, value):
+        """Check if email already exists"""
+        if Account.objects.filter(email=value).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password_confirm"]:
@@ -29,6 +35,8 @@ class AccountCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("password_confirm")
+        # Use email as username
+        validated_data["username"] = validated_data["email"]
         user = Account.objects.create_user(**validated_data)
         return user
 

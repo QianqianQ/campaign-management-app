@@ -13,7 +13,7 @@ from .serializers import (
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
-def register(request):
+def signup(request):
     serializer = AccountCreateSerializer(data=request.data)
 
     if serializer.is_valid():
