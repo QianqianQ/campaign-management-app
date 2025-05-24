@@ -8,8 +8,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-
-import api from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const signInSchema = z.object({
   email: z
@@ -33,24 +34,29 @@ type SignInFormData = z.infer<typeof signInSchema>
 
 export default function SignInForm() {
   const router = useRouter();
-
+  const { signin, isAuthenticated } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema)
-  })
+  });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router]);
 
   const onSubmit = (data: SignInFormData) => {
     console.log(data);
-    signIn(data);
+    handleSignIn(data);
   }
 
-  const signIn = async (data: SignInFormData) => {
+  const handleSignIn = async (data: SignInFormData) => {
     try {
-      const response = await api.post("/signin/", data);
-      console.log(response, response.status);
-      if (response.status === 200) {
-        localStorage.setItem('access_token', response.data.access_token);
-        localStorage.setItem('user_email', data.email);
+      const response = await signin(data);
+      if (response.success) {
         router.push("/dashboard");
+      } else {
+        console.log(response.errors);
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
@@ -61,6 +67,7 @@ export default function SignInForm() {
   }
 
   return (
+    <ProtectedRoute>
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
@@ -105,5 +112,6 @@ export default function SignInForm() {
         </CardContent>
       </Card>
     </div>
+    </ProtectedRoute>
   )
 }
