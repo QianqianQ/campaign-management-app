@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const signInSchema = z.object({
   email: z
