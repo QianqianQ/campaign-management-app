@@ -49,14 +49,14 @@ export default function SignInForm() {
       console.log(response, response.status);
       if (response.status === 200) {
         localStorage.setItem('access_token', response.data.access_token);
-        // localStorage.setItem('refresh_token', response.data.refresh_token);
+        localStorage.setItem('user_email', data.email);
         router.push("/dashboard");
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
         console.log(error.response);
       }
-      console.error("Error signing up:", error);
+      console.error("Error signing in:", error);
     }
   }
 
