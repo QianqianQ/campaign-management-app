@@ -34,16 +34,20 @@ type SignInFormData = z.infer<typeof signInSchema>
 
 export default function SignInForm() {
   const router = useRouter();
-  const { signin, isAuthenticated } = useAuth();
+  const { signin, isAuthenticated, loading } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema)
   });
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!loading && isAuthenticated) {
       router.push('/dashboard');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, loading, router]);
+
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
+  }
 
   const onSubmit = (data: SignInFormData) => {
     console.log(data);
@@ -67,7 +71,6 @@ export default function SignInForm() {
   }
 
   return (
-    <ProtectedRoute>
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
@@ -112,6 +115,5 @@ export default function SignInForm() {
         </CardContent>
       </Card>
     </div>
-    </ProtectedRoute>
   )
 }

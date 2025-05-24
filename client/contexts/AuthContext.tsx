@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<Record<string, string> | null>(null);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const router = useRouter();
 
   const signout = useCallback(() => {
@@ -34,9 +34,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const loadUser = async () => {
       const token = localStorage.getItem('access_token');
-      console.log(token);
       if (token) {
         try {
+          setLoading(true);
           const { data } = await api.get('profile/');
           setUser(data);
           setIsAuthenticated(true);
@@ -46,7 +46,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           delete api.defaults.headers.common['Authorization'];
           setUser(null);
           setIsAuthenticated(false);
+        } finally {
+          setLoading(false);
         }
+      } else {
+        setLoading(false);
       }
     };
     loadUser();
