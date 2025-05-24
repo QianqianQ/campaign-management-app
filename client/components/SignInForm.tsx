@@ -11,52 +11,52 @@ import { useRouter } from "next/navigation";
 
 import api from "@/services/api";
 
-const signupSchema = z.object({
+const signInSchema = z.object({
   email: z
     .string()
-    .min(1, "Email is required")
-    .email("Invalid email address"),
+    .min(1, "Email cannot be empty")
+    .email("Please enter a valid email address")
+    .trim()
+    .toLowerCase(),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
-  password_confirm: z
-    .string()
-    .min(1, "Confirm password is required")
-}).refine((data) => data.password === data.password_confirm, {
-  message: "Passwords don't match",
-  path: ["password_confirm"]
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character")
+    .trim(),
 })
 
 // Infer the type of the form data from the schema
-type SignupFormData = z.infer<typeof signupSchema>
+type SignInFormData = z.infer<typeof signInSchema>
 
-export default function SignupForm() {
+export default function SignInForm() {
   const router = useRouter();
-  const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({
-    resolver: zodResolver(signupSchema)
+
+  const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema)
   })
 
-  const onSubmit = (data: SignupFormData) => {
+  const onSubmit = (data: SignInFormData) => {
     console.log(data);
-    signUp(data);
+    signIn(data);
   }
 
-  const signUp = async (data: SignupFormData) => {
+  const signIn = async (data: SignInFormData) => {
     try {
-      const response = await api.post("/signup/", data);
+      const response = await api.post("/signin/", data);
       console.log(response, response.status);
-      if (response.status === 201) {
+      if (response.status === 200) {
+        localStorage.setItem('access_token', response.data.access_token);
+        localStorage.setItem('user_email', data.email);
         router.push("/dashboard");
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
         console.log(error.response);
       }
-      console.error("Error signing up:", error);
+      console.error("Error signing in:", error);
     }
   }
 
@@ -64,7 +64,7 @@ export default function SignupForm() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">Sign in</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -85,31 +85,19 @@ export default function SignupForm() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a strong password"
+                placeholder="Enter your password"
                 {...register("password")}
               />
               {errors.password && (
                 <p className="text-sm text-red-500">{errors.password.message}</p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm password</Label>
-              <Input
-                id="password_confirm"
-                type="password"
-                placeholder="Confirm your password"
-                {...register("password_confirm")}
-              />
-              {errors.password_confirm && (
-                <p className="text-sm text-red-500">{errors.password_confirm.message}</p>
-              )}
-            </div>
             <Button type="submit" className="w-full">
-              Create account
+              Sign in
             </Button>
             <div className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <a href="#" className="font-medium text-primary hover:underline">
+              Don&apos;t have an account?{" "}
+              <a href="/signup" className="font-medium text-primary hover:underline">
                 Sign up
               </a>
             </div>

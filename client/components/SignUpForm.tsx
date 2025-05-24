@@ -11,52 +11,52 @@ import { useRouter } from "next/navigation";
 
 import api from "@/services/api";
 
-const signInSchema = z.object({
+const signUpSchema = z.object({
   email: z
     .string()
-    .min(1, "Email cannot be empty")
-    .email("Please enter a valid email address")
-    .trim()
-    .toLowerCase(),
+    .min(1, "Email is required")
+    .email("Invalid email address"),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character")
-    .trim(),
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
+  password_confirm: z
+    .string()
+    .min(1, "Confirm password is required")
+}).refine((data) => data.password === data.password_confirm, {
+  message: "Passwords don't match",
+  path: ["password_confirm"]
 })
 
 // Infer the type of the form data from the schema
-type SignInFormData = z.infer<typeof signInSchema>
+type SignUpFormData = z.infer<typeof signUpSchema>
 
-export default function SignInForm() {
+export default function SignUpForm() {
   const router = useRouter();
-
-  const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
-    resolver: zodResolver(signInSchema)
+  const { register, handleSubmit, formState: { errors } } = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema)
   })
 
-  const onSubmit = (data: SignInFormData) => {
+  const onSubmit = (data: SignUpFormData) => {
     console.log(data);
-    signIn(data);
+    signUp(data);
   }
 
-  const signIn = async (data: SignInFormData) => {
+  const signUp = async (data: SignUpFormData) => {
     try {
-      const response = await api.post("/signin/", data);
+      const response = await api.post("/signup/", data);
       console.log(response, response.status);
-      if (response.status === 200) {
-        localStorage.setItem('access_token', response.data.access_token);
-        localStorage.setItem('user_email', data.email);
+      if (response.status === 201) {
         router.push("/dashboard");
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
         console.log(error.response);
       }
-      console.error("Error signing in:", error);
+      console.error("Error signing up:", error);
     }
   }
 
@@ -92,13 +92,25 @@ export default function SignInForm() {
                 <p className="text-sm text-red-500">{errors.password.message}</p>
               )}
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm password</Label>
+              <Input
+                id="password_confirm"
+                type="password"
+                placeholder="Confirm your password"
+                {...register("password_confirm")}
+              />
+              {errors.password_confirm && (
+                <p className="text-sm text-red-500">{errors.password_confirm.message}</p>
+              )}
+            </div>
             <Button type="submit" className="w-full">
-              Sign in
+              Create account
             </Button>
             <div className="text-center text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <a href="#" className="font-medium text-primary hover:underline">
-                Sign up
+              Already have an account?{" "}
+              <a href="/signin" className="font-medium text-primary hover:underline">
+                Sign in
               </a>
             </div>
           </form>
