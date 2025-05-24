@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 
 import api from "@/services/api";
 
@@ -34,6 +35,7 @@ const signupSchema = z.object({
 type SignupFormData = z.infer<typeof signupSchema>
 
 export default function SignupForm() {
+  const router = useRouter();
   const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema)
   })
@@ -47,8 +49,11 @@ export default function SignupForm() {
     try {
       const response = await api.post("/signup/", data);
       console.log(response, response.status);
-    } catch (error: any) {
-      if (error.response) {
+      if (response.status === 201) {
+        router.push("/dashboard");
+      }
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'response' in error) {
         console.log(error.response);
       }
       console.error("Error signing up:", error);
