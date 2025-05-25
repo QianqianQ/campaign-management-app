@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     "api",
+    "campaigns",
 ]
 
 REST_FRAMEWORK = {
@@ -81,7 +82,6 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
-        "rest_framework.permissions.AllowAny",
     ),
 }
 
