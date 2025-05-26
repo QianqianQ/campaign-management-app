@@ -55,3 +55,10 @@ export const deleteCampaign = async (id: number): Promise<void> => {
     const response = await apiClient.delete(`/campaigns/${id}`);
     return response.data;
 }
+
+
+// Toggile is_running status
+export const toggleCampaignRunning = async (id: number, isRunning: boolean): Promise<Campaign> => {
+    const response = await apiClient.patch(`/campaigns/${id}/`, { is_running: isRunning });
+    return response.data;
+}

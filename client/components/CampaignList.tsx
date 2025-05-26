@@ -3,7 +3,7 @@
 import { useCampaigns } from '@/hooks/useCampaigns';
 
 export default function CampaignList() {
-  const { campaigns, loading, error, fetchCampaigns } = useCampaigns();
+  const { campaigns, loading, error, fetchCampaigns, handleToggleCampaignRunning } = useCampaigns();
 
   if (loading) return <div>Loading campaigns...</div>;
   if (error) return <div className="error">Error: {error}</div>;
@@ -26,6 +26,12 @@ export default function CampaignList() {
               <a href={campaign.landing_page_url} target="_blank">
                 View Landing Page
               </a>
+              <button
+                onClick={() => handleToggleCampaignRunning(campaign.id, !campaign.is_running)}
+                style={{ cursor: 'pointer' }}
+              >
+                {campaign.is_running ? 'Stop' : 'Start'}
+              </button>
             </div>
           ))}
         </div>

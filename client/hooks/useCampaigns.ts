@@ -7,7 +7,8 @@ import {
   createCampaign,
   updateCampaign,
   deleteCampaign,
-  partialUpdateCampaign
+  partialUpdateCampaign,
+  toggleCampaignRunning
 } from '@/lib/api/campaigns';
 import { AxiosError } from 'axios';
 
@@ -47,6 +48,14 @@ export function useCampaigns() {
     }
   };
 
+  // Toggle running status
+  const handleToggleCampaignRunning = async (id: number, isRunning: boolean) => {
+    const data = await toggleCampaignRunning(id, isRunning);
+    setCampaigns(prev => prev.map(campaign =>
+      campaign.id === id ? data : campaign
+    ));
+  }
+
   return {
     campaigns,
     loading,
@@ -55,6 +64,7 @@ export function useCampaigns() {
     createCampaign,
     updateCampaign,
     deleteCampaign,
-    partialUpdateCampaign
+    partialUpdateCampaign,
+    handleToggleCampaignRunning
   };
 }
