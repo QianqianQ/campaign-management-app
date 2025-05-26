@@ -33,19 +33,20 @@ class CampaignPayoutSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs):
-        country = attrs.get("country")
-        campaign = attrs.get("campaign")
-
+        campaign = attrs.get("campaign") or self.instance.campaign
         # Skip validation during campaign creation
         if not campaign:
             return attrs
 
-        # Get all payouts for this campaign in a single query
+        # Check if worldwide or specific payout already exists
+        country = attrs.get("country")
+        # Get all payouts for this campaign
         payouts = CampaignPayout.objects.filter(campaign=campaign)
         if self.instance:
+            # Exclude current instance from payouts
             payouts = payouts.exclude(pk=self.instance.pk)
 
-        # Check both conditions from the same queryset
+        # Check if worldwide or any country-specific payout already exists
         has_worldwide = payouts.filter(country__isnull=True).exists()
         has_countries = payouts.filter(country__isnull=False).exists()
 
@@ -88,6 +89,10 @@ class CampaignSerializer(serializers.ModelSerializer):
         read_only_fields = ["created_at", "updated_at"]
 
     def validate_title(self, title):
+        # Skip validation during campaign update
+        if self.instance and self.instance.title == title:
+            return title
+
         # Check if a campaign with this title already exists
         if Campaign.objects.filter(
             account=self.context['request'].user,
@@ -152,6 +157,27 @@ class CampaignSerializer(serializers.ModelSerializer):
                 payout_serializer.is_valid(raise_exception=True)
                 payout_serializer.save()
             return campaign
+
+    def update(self, instance, validated_data):
+        payouts_data = validated_data.pop('payouts', [])
+
+        with transaction.atomic():
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
+
+            if payouts_data:
+                # Delete existing payouts
+                instance.payouts.all().delete()
+                # Update payouts
+                for payout_data in payouts_data:
+                    payout_data['campaign'] = instance.id
+                    payout_serializer = CampaignPayoutSerializer(
+                        data=payout_data)
+                    payout_serializer.is_valid(raise_exception=True)
+                    payout_serializer.save()
+
+        return instance
 
 
 class CampaignListSerializer(serializers.ModelSerializer):
