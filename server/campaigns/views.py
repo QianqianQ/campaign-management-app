@@ -34,6 +34,10 @@ class CampaignViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(account=self.request.user)
 
+    def perform_destroy(self, instance):
+        # NOTE: Possible to add custom logic to handle the deletion of the campaign
+        return super().perform_destroy(instance)
+
 
 class CampaignPayoutViewSet(viewsets.ModelViewSet):
     serializer_class = CampaignPayoutSerializer

@@ -13,7 +13,7 @@ class CampaignPayoutInline(admin.TabularInline):
 
 @admin.register(Campaign)
 class CampaignAdmin(admin.ModelAdmin):
-    list_display = ("account", "title", "landing_page_url", "is_running",
+    list_display = ("id", "account", "title", "landing_page_url", "is_running",
                     "created_at", "updated_at")
     list_filter = ("account", "is_running")
     search_fields = ("title", "landing_page_url")
