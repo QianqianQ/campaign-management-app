@@ -40,24 +40,31 @@ class CampaignPayoutSerializer(serializers.ModelSerializer):
         if not campaign:
             return attrs
 
+        # Get all payouts for this campaign in a single query
+        payouts = CampaignPayout.objects.filter(campaign=campaign)
         if self.instance:
-            # update action, exclude the current instance from the validation
-            qs = CampaignPayout.objects.filter(campaign=campaign).exclude(
-                pk=self.instance.pk)
-        else:
-            # create action
-            qs = CampaignPayout.objects.filter(campaign=campaign)
+            payouts = payouts.exclude(pk=self.instance.pk)
 
-        if country is None:
-            # if country is None, check if there is already a worldwide payout
-            if qs.filter(country__isnull=True).exists():
+        # Check both conditions from the same queryset
+        has_worldwide = payouts.filter(country__isnull=True).exists()
+        has_countries = payouts.filter(country__isnull=False).exists()
+
+        # Validate based on the current payout type
+        if country is None:  # Worldwide payout
+            if has_countries:
                 raise serializers.ValidationError(
-                    "A worldwide payout already exists for this campaign.")
-        else:
-            # if country is not None, check if there is already a payout for the country
-            if qs.filter(country=country).exists():
+                    "Cannot add worldwide payout when country-specific payouts exist")
+            if has_worldwide:
                 raise serializers.ValidationError(
-                    f"A payout for {country.name} already exists in this campaign.")
+                    "A worldwide payout already exists for this campaign")
+        else:  # Country-specific payout
+            if has_worldwide:
+                raise serializers.ValidationError(
+                    "Cannot add country-specific payout when worldwide payout exists")
+            # Check for duplicate country
+            if payouts.filter(country=country).exists():
+                raise serializers.ValidationError(
+                    f"A payout for {country.name} already exists in this campaign")
 
         return attrs
 
@@ -79,6 +86,16 @@ class CampaignSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["created_at", "updated_at"]
+
+    def validate_title(self, title):
+        # Check if a campaign with this title already exists
+        if Campaign.objects.filter(
+            account=self.context['request'].user,
+            title=title
+        ).exists():
+            raise serializers.ValidationError(
+                "A campaign with this title already exists")
+        return title
 
     def validate_payouts(self, payouts):
         if not payouts or not isinstance(payouts, list):
