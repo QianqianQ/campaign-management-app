@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 
-import api from "@/services/api";
+import apiClient from "@/services/api";
 
 const signUpSchema = z.object({
   email: z
@@ -47,10 +47,10 @@ export default function SignUpForm() {
 
   const signUp = async (data: SignUpFormData) => {
     try {
-      const response = await api.post("/signup/", data);
+      const response = await apiClient.post("/signup/", data);
       console.log(response, response.status);
       if (response.status === 201) {
-        router.push("/dashboard");
+        router.push("/signin/");
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {

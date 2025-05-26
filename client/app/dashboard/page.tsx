@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
+import CampaignList from "@/components/CampaignList";
+
 export default function Dashboard() {
   const { signout, user, isAuthenticated, loading } = useAuth();
   const router = useRouter();
@@ -35,6 +37,7 @@ export default function Dashboard() {
           <p className="text-lg">Logged in as: {user?.email || "Unknown"}</p>
         </CardContent>
       </Card>
+      <CampaignList />
     </div>
   );
 }

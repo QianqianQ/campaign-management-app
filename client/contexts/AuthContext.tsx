@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios'
-import api from '@/services/api';
+import axios from 'axios';
+import apiClient from '@/lib/api/client';
 
 interface AuthContextType {
   // TODO: add type for user
@@ -25,10 +25,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signout = useCallback(() => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    delete api.defaults.headers.common['Authorization'];
+    delete apiClient.defaults.headers.common['Authorization'];
     setUser(null);
     setIsAuthenticated(false);
-    router.push('/signin');
+    router.push('/signin/');
   }, [router]);
 
   useEffect(() => {
@@ -37,13 +37,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (token) {
         try {
           setLoading(true);
-          const { data } = await api.get('profile/');
+          const { data } = await apiClient.get('profile/');
           setUser(data);
           setIsAuthenticated(true);
         } catch {
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
-          delete api.defaults.headers.common['Authorization'];
+          delete apiClient.defaults.headers.common['Authorization'];
           setUser(null);
           setIsAuthenticated(false);
         } finally {
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // signin with email and password
   const signin = async (formData: Record<string, string>) => {
     try {
-      const res = await api.post('signin/', formData);
+      const res = await apiClient.post('signin/', formData);
       const { access_token, refresh_token, user } = res.data;
 
       localStorage.setItem('access_token', access_token);

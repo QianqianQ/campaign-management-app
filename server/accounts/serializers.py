@@ -29,6 +29,7 @@ class AccountCreateSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
+        # TODO: add password strength validation
         if attrs["password"] != attrs["password_confirm"]:
             raise serializers.ValidationError({"password": "Passwords do not match"})
         return attrs
