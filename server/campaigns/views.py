@@ -1,16 +1,57 @@
-from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Campaign
-from .serializers import CampaignSerializer
+from .models import Campaign, CampaignPayout
+from .serializers import (
+    CampaignSerializer,
+    CampaignPayoutSerializer,
+    CampaignListSerializer,
+)
 
 
 class CampaignViewSet(viewsets.ModelViewSet):
     serializer_class = CampaignSerializer
     permission_classes = [IsAuthenticated]
+    lookup_field = "pk"
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return CampaignSerializer
+        return CampaignListSerializer
 
     def get_queryset(self):
-        return Campaign.objects.filter(
+        queryset = Campaign.objects.filter(
             account=self.request.user
-        ).prefetch_related('payouts')
+        ).prefetch_related("payouts")
+
+        is_running = self.request.query_params.get('is_running')
+        if is_running is not None:
+            is_running = is_running.lower() == 'true'
+            queryset = queryset.filter(is_running=is_running)
+
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(account=self.request.user)
+
+
+class CampaignPayoutViewSet(viewsets.ModelViewSet):
+    serializer_class = CampaignPayoutSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = "pk"
+
+    def get_queryset(self):
+        queryset = CampaignPayout.objects.filter(
+            campaign__account=self.request.user
+        ).select_related('campaign')
+
+        campaign_id = self.request.query_params.get('campaign')
+        if campaign_id:
+            try:
+                campaign_id = int(campaign_id)
+                queryset = queryset.filter(campaign=campaign_id)
+            except ValueError:
+                raise serializers.ValidationError(
+                    "Invalid campaign ID")
+
+        return queryset
