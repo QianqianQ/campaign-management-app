@@ -1,11 +1,11 @@
-from rest_framework import viewsets, serializers
+from rest_framework import serializers, viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Campaign, CampaignPayout
 from .serializers import (
-    CampaignSerializer,
-    CampaignPayoutSerializer,
     CampaignListSerializer,
+    CampaignPayoutSerializer,
+    CampaignSerializer,
 )
 
 
@@ -15,18 +15,18 @@ class CampaignViewSet(viewsets.ModelViewSet):
     lookup_field = "pk"
 
     def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partial_update']:
+        if self.action in ["create", "update", "partial_update"]:
             return CampaignSerializer
         return CampaignListSerializer
 
     def get_queryset(self):
-        queryset = Campaign.objects.filter(
-            account=self.request.user
-        ).prefetch_related("payouts")
+        queryset = Campaign.objects.filter(account=self.request.user).prefetch_related(
+            "payouts"
+        )
 
-        is_running = self.request.query_params.get('is_running')
+        is_running = self.request.query_params.get("is_running")
         if is_running is not None:
-            is_running = is_running.lower() == 'true'
+            is_running = is_running.lower() == "true"
             queryset = queryset.filter(is_running=is_running)
 
         return queryset
@@ -51,15 +51,14 @@ class CampaignPayoutViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = CampaignPayout.objects.filter(
             campaign__account=self.request.user
-        ).select_related('campaign')
+        ).select_related("campaign")
 
-        campaign_id = self.request.query_params.get('campaign')
+        campaign_id = self.request.query_params.get("campaign")
         if campaign_id:
             try:
                 campaign_id = int(campaign_id)
                 queryset = queryset.filter(campaign=campaign_id)
             except ValueError:
-                raise serializers.ValidationError(
-                    "Invalid campaign ID")
+                raise serializers.ValidationError("Invalid campaign ID")
 
         return queryset

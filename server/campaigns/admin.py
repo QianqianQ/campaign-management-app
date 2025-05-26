@@ -1,9 +1,11 @@
 from django.contrib import admin
+
 from .models import Campaign, CampaignPayout
 
 
 class CampaignPayoutInline(admin.TabularInline):
     """Display the campaign payouts in the campaign admin page"""
+
     model = CampaignPayout
     extra = 1
     fk_name = "campaign"
@@ -13,8 +15,15 @@ class CampaignPayoutInline(admin.TabularInline):
 
 @admin.register(Campaign)
 class CampaignAdmin(admin.ModelAdmin):
-    list_display = ("id", "account", "title", "landing_page_url", "is_running",
-                    "created_at", "updated_at")
+    list_display = (
+        "id",
+        "account",
+        "title",
+        "landing_page_url",
+        "is_running",
+        "created_at",
+        "updated_at",
+    )
     list_filter = ("account", "is_running")
     search_fields = ("title", "landing_page_url")
     readonly_fields = ("created_at", "updated_at")
@@ -22,16 +31,17 @@ class CampaignAdmin(admin.ModelAdmin):
     list_per_page = 20
 
     fieldsets = (
-        ("Campaign", {
-            "fields": ("account", "title", "landing_page_url")
-        }),
-        ("Status", {
-            "fields": ("is_running",),
-        }),
-        ("Timestamps", {
-            "fields": ("created_at", "updated_at"),
-            "classes": ("collapse",)
-        }),
+        ("Campaign", {"fields": ("account", "title", "landing_page_url")}),
+        (
+            "Status",
+            {
+                "fields": ("is_running",),
+            },
+        ),
+        (
+            "Timestamps",
+            {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
+        ),
     )
 
 

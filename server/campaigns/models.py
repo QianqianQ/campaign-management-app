@@ -1,6 +1,5 @@
-from django.db import models
 from django.core.validators import URLValidator
-
+from django.db import models
 from django_countries.fields import CountryField
 
 from accounts.models import Account
@@ -8,6 +7,7 @@ from accounts.models import Account
 
 class Campaign(models.Model):
     """Campaign model for the campaign"""
+
     # NOTE: Consider implementing soft deletion using is_deleted field
     account = models.ForeignKey(
         Account, on_delete=models.CASCADE, related_name="campaigns"
@@ -32,7 +32,7 @@ class Campaign(models.Model):
         ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["account", "is_running"]),
-            models.Index(fields=["title"])
+            models.Index(fields=["title"]),
         ]
 
     def __str__(self):
@@ -41,6 +41,7 @@ class Campaign(models.Model):
 
 class CampaignPayout(models.Model):
     """Campaign payout model for the campaign"""
+
     # TODO: Add custom validation for the country vs worldwide conflict
     campaign = models.ForeignKey(
         Campaign, on_delete=models.CASCADE, related_name="payouts"
