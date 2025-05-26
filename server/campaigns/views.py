@@ -38,6 +38,10 @@ class CampaignViewSet(viewsets.ModelViewSet):
         # NOTE: Possible to add custom logic to handle the deletion of the campaign
         return super().perform_destroy(instance)
 
+    def partial_update(self, request, *args, **kwargs):
+        # NOTE: Possible to add custom logic to handle the partial update
+        return super().partial_update(request, *args, **kwargs)
+
 
 class CampaignPayoutViewSet(viewsets.ModelViewSet):
     serializer_class = CampaignPayoutSerializer
