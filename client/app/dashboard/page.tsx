@@ -1,15 +1,17 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-
 import CampaignList from "@/components/CampaignList";
+import CampaignSearch from "@/components/CampaignSearch";
+import { CampaignSearchFilters } from "@/lib/api/campaigns";
 
 export default function Dashboard() {
   const { signout, user, isAuthenticated, loading } = useAuth();
+  const [searchFilters, setSearchFilters] = useState<CampaignSearchFilters>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -22,6 +24,14 @@ export default function Dashboard() {
   // if loading or not authenticated, show loading screen
   if (loading || !isAuthenticated) {
     return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
+  }
+
+  const handleSearch = (filters: CampaignSearchFilters) => {
+    setSearchFilters(filters);
+  }
+
+  const handleClearSearch = () => {
+    setSearchFilters({});
   }
 
   return (
@@ -37,7 +47,8 @@ export default function Dashboard() {
           <p className="text-lg">Logged in as: {user?.email || "Unknown"}</p>
         </CardContent>
       </Card>
-      <CampaignList />
+      <CampaignSearch onSearch={handleSearch} onClear={handleClearSearch} />
+      <CampaignList searchFilters={searchFilters} />
     </div>
   );
 }

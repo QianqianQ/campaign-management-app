@@ -6,6 +6,7 @@ export interface Campaign {
   title: string;
   landing_page_url: string;
   is_running: boolean;
+  payouts: CampaignPayout[];
   created_at: Date;
   updated_at: Date;
 }
@@ -20,15 +21,45 @@ export interface CampaignPayout {
     updated_at: Date;
 }
 
+export interface CampaignSearchFilters {
+    title?: string;
+    landing_page_url?: string;
+    is_running?: boolean;
+    search?: string;
+}
+
 // Create a campaign
 export const createCampaign = async (campaign: Campaign): Promise<Campaign> => {
     const response = await apiClient.post('/campaigns', campaign);
     return response.data;
 }
 
-// Get all campaigns
-export const getCampaigns = async (): Promise<Campaign[]> => {
-    const response = await apiClient.get('/campaigns');
+// Get all campaigns with possible filters
+export const getCampaigns = async (filters?: CampaignSearchFilters): Promise<Campaign[]> => {
+    const params = new URLSearchParams();
+
+    if (filters?.title) params.append('title', filters.title);
+    if (filters?.landing_page_url) params.append('landing_page_url', filters.landing_page_url);
+    if (filters?.is_running !== null && filters?.is_running !== undefined) params.append('is_running',
+        filters.is_running.toString());
+    if (filters?.search) params.append('search', filters.search);
+
+    const queryString = params.toString();
+    const url = queryString ? `/campaigns?${queryString}` : '/campaigns';
+    const response = await apiClient.get(url);
+    return response.data;
+}
+
+export const searchCampaigns = async (filters?: CampaignSearchFilters): Promise<Campaign[]> => {
+    const params = new URLSearchParams();
+
+    if (filters?.title) params.append('title', filters.title);
+    if (filters?.landing_page_url) params.append('landing_page_url', filters.landing_page_url);
+    if (filters?.is_running !== null && filters?.is_running !== undefined) params.append('is_running',
+        filters.is_running.toString());
+    if (filters?.search) params.append('search', filters.search);
+
+    const response = await apiClient.get(`/campaigns?${params.toString()}`);
     return response.data;
 }
 

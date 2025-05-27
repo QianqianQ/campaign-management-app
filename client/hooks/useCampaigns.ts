@@ -1,6 +1,5 @@
 // hooks/useCampaigns.ts - Minor updates for better error handling
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useCallback } from 'react';
 import {
   Campaign,
   getCampaigns,
@@ -8,7 +7,8 @@ import {
   updateCampaign,
   deleteCampaign,
   partialUpdateCampaign,
-  toggleCampaignRunning
+  toggleCampaignRunning,
+  CampaignSearchFilters
 } from '@/lib/api/campaigns';
 import { AxiosError } from 'axios';
 
@@ -21,21 +21,13 @@ export function useCampaigns() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchCampaigns();
-    } else {
-      setLoading(false);
-    }
-  }, [isAuthenticated]);
-
-  const fetchCampaigns = async () => {
+  // Fetch campaigns with optional filters
+  const fetchCampaigns = useCallback(async (filters?: CampaignSearchFilters) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getCampaigns();
+      const data = await getCampaigns(filters);
       setCampaigns(data);
     } catch (err) {
       const axiosError = err as AxiosError<ErrorResponse>;
@@ -46,7 +38,7 @@ export function useCampaigns() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Toggle running status
   const handleToggleCampaignRunning = async (id: number, isRunning: boolean) => {
@@ -55,6 +47,7 @@ export function useCampaigns() {
       campaign.id === id ? data : campaign
     ));
   }
+
 
   return {
     campaigns,

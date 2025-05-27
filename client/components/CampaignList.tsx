@@ -1,18 +1,37 @@
 'use client';
 
-import { useCampaigns } from '@/hooks/useCampaigns';
+import { useEffect } from 'react';
 
-export default function CampaignList() {
-  const { campaigns, loading, error, fetchCampaigns, handleToggleCampaignRunning } = useCampaigns();
+import { useCampaigns } from '@/hooks/useCampaigns';
+import { CampaignSearchFilters } from '@/lib/api/campaigns';
+
+
+interface campaignListProps {
+  searchFilters: CampaignSearchFilters;
+}
+
+export default function CampaignList({ searchFilters = {} }: campaignListProps) {
+  const {
+    campaigns,
+    loading,
+    error,
+    fetchCampaigns,
+    handleToggleCampaignRunning,
+  } = useCampaigns();
+
+  useEffect(() => {
+    fetchCampaigns(searchFilters);
+  }, [searchFilters, fetchCampaigns]);
 
   if (loading) return <div>Loading campaigns...</div>;
   if (error) return <div className="error">Error: {error}</div>;
+
 
   return (
     <div>
       <div>
         <h2>Campaigns</h2>
-        <button onClick={fetchCampaigns}>Refresh</button>
+        <button onClick={() => fetchCampaigns(searchFilters)}>Refresh</button>
       </div>
 
       {campaigns.length === 0 ? (
