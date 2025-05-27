@@ -48,7 +48,7 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
 
     const addPayout = () => {
         append({
-            country: '',
+            country: 'Worldwide',
             amount: 0,
             currency: 'EUR',
         });

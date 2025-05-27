@@ -1,14 +1,15 @@
-from rest_framework import serializers, viewsets
-from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import serializers, viewsets
 from rest_framework.filters import OrderingFilter
+from rest_framework.permissions import IsAuthenticated
+
+from .filters import CampaignFilter
 from .models import Campaign, CampaignPayout
 from .serializers import (
     CampaignListSerializer,
     CampaignPayoutSerializer,
     CampaignSerializer,
 )
-from .filters import CampaignFilter
 
 
 class CampaignViewSet(viewsets.ModelViewSet):
@@ -18,19 +19,17 @@ class CampaignViewSet(viewsets.ModelViewSet):
     lookup_field = "pk"
 
     ordering_fields = [
-        'title',
-        'landing_page_url',
-        'is_running',
-        'created_at',
-        'updated_at'
+        "title",
+        "landing_page_url",
+        "is_running",
+        "created_at",
+        "updated_at",
     ]
     ordering = ["-created_at"]
 
     def get_queryset(self):
-        return (
-            Campaign.objects
-            .filter(account=self.request.user)
-            .prefetch_related("payouts")
+        return Campaign.objects.filter(account=self.request.user).prefetch_related(
+            "payouts"
         )
 
     def get_serializer_class(self):
