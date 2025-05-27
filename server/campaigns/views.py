@@ -1,35 +1,42 @@
 from rest_framework import serializers, viewsets
 from rest_framework.permissions import IsAuthenticated
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter
 from .models import Campaign, CampaignPayout
 from .serializers import (
     CampaignListSerializer,
     CampaignPayoutSerializer,
     CampaignSerializer,
 )
+from .filters import CampaignFilter
 
 
 class CampaignViewSet(viewsets.ModelViewSet):
-    serializer_class = CampaignSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = CampaignFilter
     lookup_field = "pk"
+
+    ordering_fields = [
+        'title',
+        'landing_page_url',
+        'is_running',
+        'created_at',
+        'updated_at'
+    ]
+    ordering = ["-created_at"]
+
+    def get_queryset(self):
+        return (
+            Campaign.objects
+            .filter(account=self.request.user)
+            .prefetch_related("payouts")
+        )
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
             return CampaignSerializer
         return CampaignListSerializer
-
-    def get_queryset(self):
-        queryset = Campaign.objects.filter(account=self.request.user).prefetch_related(
-            "payouts"
-        )
-
-        is_running = self.request.query_params.get("is_running")
-        if is_running is not None:
-            is_running = is_running.lower() == "true"
-            queryset = queryset.filter(is_running=is_running)
-
-        return queryset
 
     def perform_create(self, serializer):
         serializer.save(account=self.request.user)
