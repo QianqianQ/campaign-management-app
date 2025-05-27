@@ -7,7 +7,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import CampaignList from "@/components/CampaignList";
 import CampaignSearch from "@/components/CampaignSearch";
-import { CampaignSearchFilters } from "@/lib/api/campaigns";
+import { Campaign, CampaignSearchFilters } from "@/lib/api/campaigns";
+import CampaignCreateForm from "@/components/CampaignCreateForm";
 
 export default function Dashboard() {
   const { signout, user, isAuthenticated, loading } = useAuth();
@@ -34,6 +35,14 @@ export default function Dashboard() {
     setSearchFilters({});
   }
 
+  const handleCreateCampaign = async (campaign: Campaign) => {
+    console.log(campaign);
+  }
+
+  const handleCancelCreateCampaign = () => {
+    console.log("Cancel");
+  }
+
   return (
     <div className="container mx-auto p-4">
       <Card>
@@ -49,6 +58,7 @@ export default function Dashboard() {
       </Card>
       <CampaignSearch onSearch={handleSearch} onClear={handleClearSearch} />
       <CampaignList searchFilters={searchFilters} />
+      <CampaignCreateForm onSubmit={handleCreateCampaign} onCancel={handleCancelCreateCampaign} />
     </div>
   );
 }
