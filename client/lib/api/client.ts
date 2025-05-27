@@ -1,7 +1,10 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios"
 
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api";
+console.log('API Base URL:', baseURL);
+
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
+  baseURL,
   timeout: 10000, // 10 seconds
   headers: {
     "Content-Type": "application/json",
@@ -11,6 +14,8 @@ const apiClient = axios.create({
 // Add a request interceptor to include the auth token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+  console.log('Making request to:', (config.baseURL || '') + (config.url || ''));
+
   // Skip token for auth endpoints
   if (config.url?.includes('/signin') || config.url?.includes('/signup')) {
     return config;
