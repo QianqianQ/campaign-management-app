@@ -42,10 +42,6 @@ export default function Dashboard() {
     await createCampaign(campaign);
   }
 
-  const handleCancelCreateCampaign = () => {
-    console.log("Cancel");
-  }
-
   return (
     <div className="container mx-auto p-4">
       <Card>
@@ -61,7 +57,7 @@ export default function Dashboard() {
       </Card>
       <CampaignSearch onSearch={handleSearch} onClear={handleClearSearch} />
       <CampaignList searchFilters={searchFilters} />
-      <CampaignCreateForm onSubmit={handleCreateCampaign} onCancel={handleCancelCreateCampaign} />
+      <CampaignCreateForm onSubmit={handleCreateCampaign} />
     </div>
   );
 }

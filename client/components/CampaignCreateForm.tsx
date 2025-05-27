@@ -1,15 +1,13 @@
 'use client';
 
-import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Campaign } from "@/types/campaign";
-import { useCampaigns } from "@/hooks/useCampaigns";
 import { CampaignFormData, campaignSchema } from "@/schemas/campaignSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 interface CampaignCreateFormProps {
   onSubmit: (formData: Partial<Campaign>) => Promise<void>;
-  onCancel: () => void;
+//   onCancel: () => void;
 }
 
 // TODO: Move to a constants file, and use a library for the countries and currencies
@@ -25,7 +23,7 @@ const COUNTRIES = [
   { code: 'JP', name: 'Japan' },
 ];
 
-export default function CampaignCreateForm({ onSubmit, onCancel }: CampaignCreateFormProps) {
+export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps) {
     const { register, handleSubmit, control, formState: { errors }, reset } = useForm<CampaignFormData>(
         {
             resolver: zodResolver(campaignSchema),

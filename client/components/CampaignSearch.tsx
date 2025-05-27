@@ -40,7 +40,7 @@ export default function CampaignSearch({ onSearch, onClear, loading }: CampaignS
     onClear();
   };
 
-  const handleChange = (field: keyof CampaignSearchFilters, value: any) => {
+  const handleChange = (field: keyof CampaignSearchFilters, value: string | boolean | null) => {
     setSearchForm(prev => ({
       ...prev,
       [field]: value
