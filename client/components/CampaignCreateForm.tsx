@@ -8,7 +8,7 @@ import { CampaignFormData, campaignSchema } from "@/schemas/campaignSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 interface CampaignCreateFormProps {
-  onSubmit: (formData: Campaign) => Promise<void>;
+  onSubmit: (formData: Partial<Campaign>) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -26,7 +26,6 @@ const COUNTRIES = [
 ];
 
 export default function CampaignCreateForm({ onSubmit, onCancel }: CampaignCreateFormProps) {
-    const { createCampaign } = useCampaigns();
     const { register, handleSubmit, control, formState: { errors }, reset } = useForm<CampaignFormData>(
         {
             resolver: zodResolver(campaignSchema),
@@ -36,7 +35,7 @@ export default function CampaignCreateForm({ onSubmit, onCancel }: CampaignCreat
                 is_running: false,
                 payouts: [
                     {
-                    country: 'worldwide',
+                    country: 'Worldwide',
                     amount: 0,
                     currency: 'EUR',
                     }
@@ -60,7 +59,15 @@ export default function CampaignCreateForm({ onSubmit, onCancel }: CampaignCreat
     const handleFormSubmit = async (data: CampaignFormData) => {
         console.log(data);
         try {
-            await onSubmit(data as Campaign);
+            // Transform "Worldwide" to null for backend
+            const transformedData = {
+                ...data,
+                payouts: data.payouts.map(payout => ({
+                    ...payout,
+                    country: payout.country === 'Worldwide' ? null : payout.country
+                }))
+            };
+            await onSubmit(transformedData as Partial<Campaign>);
             reset();
         } catch (error) {
             console.error('Error creating campaign:', error);
@@ -92,7 +99,7 @@ export default function CampaignCreateForm({ onSubmit, onCancel }: CampaignCreat
                 <div key={field.id}>
                     <select {...register(`payouts.${index}.country`)}>
                         {COUNTRIES.map((country) => (
-                            <option key={country.code || 'worldwide'} value={country.code || 'worldwide'}>{country.name}</option>
+                            <option key={country.code || 'Worldwide'} value={country.code || 'Worldwide'}>{country.name}</option>
                         ))}
                     </select>
                     <input type="number" step="0.01" placeholder="Amount" {...register(`payouts.${index}.amount`)} className="w-1/2 px-3 py-2 border rounded" />

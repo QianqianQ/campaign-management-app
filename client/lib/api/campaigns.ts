@@ -29,8 +29,8 @@ export interface CampaignSearchFilters {
 }
 
 // Create a campaign
-export const createCampaign = async (campaign: Campaign): Promise<Campaign> => {
-    const response = await apiClient.post('/campaigns', campaign);
+export const createCampaign = async (campaign: Partial<Campaign>): Promise<Campaign> => {
+    const response = await apiClient.post('/campaigns/', campaign);
     return response.data;
 }
 

@@ -7,6 +7,7 @@ from .models import Campaign, CampaignPayout
 class CampaignPayoutSerializer(serializers.ModelSerializer):
     is_worldwide = serializers.ReadOnlyField()
     display_country = serializers.ReadOnlyField()
+    country = serializers.SerializerMethodField()
 
     class Meta:
         model = CampaignPayout
@@ -31,6 +32,12 @@ class CampaignPayoutSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "campaign": {"required": False},
         }
+
+    def get_country(self, obj):
+        """Serialize country field properly"""
+        if obj.country:
+            return f"{obj.country.name} ({obj.country.code})"
+        return None
 
     def validate(self, attrs):
         campaign = attrs.get("campaign") or self.instance.campaign

@@ -9,10 +9,12 @@ import CampaignList from "@/components/CampaignList";
 import CampaignSearch from "@/components/CampaignSearch";
 import { Campaign, CampaignSearchFilters } from "@/lib/api/campaigns";
 import CampaignCreateForm from "@/components/CampaignCreateForm";
+import { useCampaigns } from "@/hooks/useCampaigns";
 
 export default function Dashboard() {
   const { signout, user, isAuthenticated, loading } = useAuth();
   const [searchFilters, setSearchFilters] = useState<CampaignSearchFilters>({});
+  const { createCampaign } = useCampaigns();
   const router = useRouter();
 
   useEffect(() => {
@@ -35,8 +37,9 @@ export default function Dashboard() {
     setSearchFilters({});
   }
 
-  const handleCreateCampaign = async (campaign: Campaign) => {
+  const handleCreateCampaign = async (campaign: Partial<Campaign>) => {
     console.log(campaign);
+    await createCampaign(campaign);
   }
 
   const handleCancelCreateCampaign = () => {
