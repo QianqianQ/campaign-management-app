@@ -26,8 +26,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     delete apiClient.defaults.headers.common['Authorization'];
-    setUser(null);
     setIsAuthenticated(false);
+    setUser(null);
+    setLoading(false);
     router.push('/signin/');
   }, [router]);
 
@@ -50,6 +51,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setLoading(false);
         }
       } else {
+        setUser(null);
+        setIsAuthenticated(false);
         setLoading(false);
       }
     };

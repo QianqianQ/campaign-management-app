@@ -15,15 +15,15 @@ export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    // if not authenticated and not loading, redirect to signin
+    console.log('Dashboard: isAuthenticated:', isAuthenticated, 'loading:', loading);
     if (!loading && !isAuthenticated) {
-      router.push('/signin');
+      router.replace('/signin');
     }
   }, [isAuthenticated, loading, router]);
 
-  // if loading or not authenticated, show loading screen
+  // Show nothing while loading to prevent flash
   if (loading || !isAuthenticated) {
-    return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
+    return null;
   }
 
   const handleSearch = (filters: CampaignSearchFilters) => {
