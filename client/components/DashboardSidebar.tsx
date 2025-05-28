@@ -20,7 +20,7 @@ interface SidebarItem {
 
 const sidebarItems: SidebarItem[] = [
   { title: 'Overview', path: '/', icon: Home },
-  { title: 'Add Campaigns', path: '/campaigns', icon: Plus },
+  { title: 'Add Campaigns', path: '/campaigns/add', icon: Plus },
   // { title: 'Create Campaign', path: '/campaigns/create', icon: Plus },
   // { title: 'Profile', path: '/profile', icon: User },
 ];

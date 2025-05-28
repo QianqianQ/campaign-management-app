@@ -12,7 +12,7 @@ const handleCreateCampaign = async (campaign: Partial<Campaign>) => {
 
 export default function Campaigns() {
   return (
-    <DashboardLayout title="Campaigns">
+    <DashboardLayout title="Add Campaigns">
       <div className="h-full w-full">
         <CampaignCreateForm onSubmit={handleCreateCampaign} />
       </div>

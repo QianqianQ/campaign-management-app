@@ -32,6 +32,11 @@ const countries = [
   { code: "KR", name: "South Korea" },
 ]
 
+const currencies = [
+  { code: "EUR", name: "Euro" },
+  { code: "USD", name: "US Dollar" },
+]
+
 interface CampaignCreateFormProps {
     onSubmit: (formData: Partial<Campaign>) => Promise<void>;
   //   onCancel: () => void;
@@ -176,6 +181,7 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
               <div className="space-y-4">
                 {fields.map((payout, index) => (
                   <div key={payout.id} className="flex items-end gap-4 p-6 border rounded-lg bg-white shadow-sm">
+
                     <div className="flex-1 space-y-3">
                       <Label htmlFor={`country-${payout.id}`} className="text-base font-medium">Country</Label>
                       <Controller
@@ -186,7 +192,7 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                             value={field.value === null ? 'Worldwide' : field.value || 'Worldwide'}
                             onValueChange={(value) => field.onChange(value === 'Worldwide' ? null : value)}
                           >
-                            <SelectTrigger className={`h-12 text-base ${errors.payouts?.[index]?.country ? "border-red-500" : ""}`}>
+                            <SelectTrigger className={`w-full h-12 text-base ${errors.payouts?.[index]?.country ? "border-red-500" : ""}`}>
                               <SelectValue placeholder="Select country" />
                             </SelectTrigger>
                             <SelectContent>
@@ -203,8 +209,37 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                         <p className="text-sm text-red-500">{errors.payouts[index]?.country?.message}</p>
                       )}
                     </div>
+
                     <div className="flex-1 space-y-3">
-                      <Label htmlFor={`amount-${payout.id}`} className="text-base font-medium">Amount (USD)</Label>
+                      <Label htmlFor={`currency-${payout.id}`} className="text-base font-medium">Currency</Label>
+                      <Controller
+                        name={`payouts.${index}.currency`}
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={field.value}
+                            onValueChange={(value) => field.onChange(value)}
+                          >
+                            <SelectTrigger className={`w-full h-12 text-base ${errors.payouts?.[index]?.currency ? "border-red-500" : ""}`}>
+                              <SelectValue placeholder="Select currency" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {currencies.map((currency) => (
+                                <SelectItem key={currency.code} value={currency.code}>
+                                  {currency.code}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.payouts?.[index]?.currency && (
+                        <p className="text-sm text-red-500">{errors.payouts[index]?.currency?.message}</p>
+                      )}
+                    </div>
+
+                    <div className="flex-1 space-y-3">
+                      <Label htmlFor={`amount-${payout.id}`} className="text-base font-medium">Amount</Label>
                       <div className="relative">
                         <span className="absolute left-4 top-3.5 text-muted-foreground text-base">$</span>
                         <Input
@@ -244,7 +279,7 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
           </CardContent>
           <CardFooter className="flex justify-between border-t px-8 py-6">
             <div className="text-base text-muted-foreground">
-              {fields.length} payout{fields.length !== 1 ? "s" : ""} configured
+              {fields.length} payout{fields.length !== 1 ? "s" : ""} added
             </div>
             <div className="flex gap-3">
               <Button type="button" variant="outline" className="h-12 px-6 text-base">
