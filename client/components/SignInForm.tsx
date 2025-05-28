@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import LoadingSpinner from "./LoadingSpinner";
@@ -34,16 +34,19 @@ type SignInFormData = z.infer<typeof signInSchema>
 
 export default function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signin, isAuthenticated, loading } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema)
   });
 
+  const returnUrl = searchParams.get('returnUrl') || '/';
+
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      router.push('/dashboard');
+      router.push(returnUrl);
     }
-  }, [isAuthenticated, loading, router]);
+  }, [isAuthenticated, loading, router, returnUrl]);
 
   if (loading) {
     return <LoadingSpinner />;
@@ -58,7 +61,7 @@ export default function SignInForm() {
     try {
       const response = await signin(data);
       if (response.success) {
-        router.push("/dashboard");
+        router.push(returnUrl);
       } else {
         console.log(response.errors);
       }

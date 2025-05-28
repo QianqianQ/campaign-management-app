@@ -16,7 +16,7 @@ export default function PublicPageGuard({ children }: PublicPageGuardProps) {
   useEffect(() => {
     // Redirect authenticated users to dashboard
     if (!loading && isAuthenticated) {
-      router.push('/dashboard');
+      router.push('/');
     }
   }, [isAuthenticated, loading, router]);
 

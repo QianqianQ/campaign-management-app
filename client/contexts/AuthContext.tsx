@@ -8,7 +8,7 @@ import apiClient from '@/lib/api/client';
 interface AuthContextType {
   // TODO: add type for user
   user: Record<string, string> | null;
-  signin: (formData: Record<string, string>) => Promise<{ success: boolean; errors?: any }>;
+  signin: (formData: Record<string, string>) => Promise<{ success: boolean; errors?: Record<string, unknown> }>;
   signout: () => void;
   isAuthenticated: boolean;
   loading: boolean;
@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<Record<string, string> | null>(null);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   const signout = useCallback(() => {
