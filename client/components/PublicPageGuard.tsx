@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import LoadingSpinner from './LoadingSpinner';
 
 interface PublicPageGuardProps {
   children: React.ReactNode;
@@ -13,7 +14,6 @@ export default function PublicPageGuard({ children }: PublicPageGuardProps) {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('PublicPageGuard: isAuthenticated:', isAuthenticated, 'loading:', loading);
     // Redirect authenticated users to dashboard
     if (!loading && isAuthenticated) {
       router.push('/dashboard');
@@ -22,7 +22,7 @@ export default function PublicPageGuard({ children }: PublicPageGuardProps) {
 
   // Show loading while checking authentication
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   // Do not render anything if user is authenticated (while redirecting)

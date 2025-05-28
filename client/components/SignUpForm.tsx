@@ -48,15 +48,15 @@ export default function SignUpForm() {
   const signUp = async (data: SignUpFormData) => {
     try {
       const response = await apiClient.post("/signup/", data);
-      console.log(response, response.status);
       if (response.status === 201) {
         router.push("/signin/");
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
-        console.log(error.response);
+        console.log("Error signing up:", error.response);
+      } else {
+        console.error("Error signing up:", error);
       }
-      console.error("Error signing up:", error);
     }
   }
 

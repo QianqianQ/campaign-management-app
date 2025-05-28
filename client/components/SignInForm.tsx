@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
+import LoadingSpinner from "./LoadingSpinner";
 
 const signInSchema = z.object({
   email: z
@@ -45,7 +46,7 @@ export default function SignInForm() {
   }, [isAuthenticated, loading, router]);
 
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   const onSubmit = (data: SignInFormData) => {
@@ -63,9 +64,10 @@ export default function SignInForm() {
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
-        console.log(error.response);
+        console.log("Error signing in:", error.response);
+      } else {
+        console.error("Error signing in:", error);
       }
-      console.error("Error signing in:", error);
     }
   }
 
