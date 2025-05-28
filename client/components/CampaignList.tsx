@@ -245,7 +245,7 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {campaign.payouts.slice(0, 2).map((payout, i) => (
+                          {(campaign.payouts || []).slice(0, 2).map((payout, i) => (
                             <Badge key={i} variant="outline" className="flex items-center gap-1">
                               <span>{formatCountry(payout.country)}</span>
                               <span>
@@ -254,17 +254,17 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
                               </span>
                             </Badge>
                           ))}
-                          {campaign.payouts.length > 2 && (
+                          {(campaign.payouts || []).length > 2 && (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Badge variant="outline" className="cursor-pointer">
-                                  +{campaign.payouts.length - 2} more
+                                  +{(campaign.payouts || []).length - 2} more
                                 </Badge>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="start">
                                 <DropdownMenuLabel>All Payouts</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {campaign.payouts.map((payout, i) => (
+                                {(campaign.payouts || []).map((payout, i) => (
                                   <DropdownMenuItem key={i}>
                                     <span className="font-medium">
                                       {formatCountry(payout.country)}:
