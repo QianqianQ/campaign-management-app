@@ -13,7 +13,7 @@ const handleCreateCampaign = async (campaign: Partial<Campaign>) => {
 export default function Campaigns() {
   return (
     <DashboardLayout title="Campaigns">
-      <div className="max-w-2xl">
+      <div className="h-full w-full">
         <CampaignCreateForm onSubmit={handleCreateCampaign} />
       </div>
     </DashboardLayout>

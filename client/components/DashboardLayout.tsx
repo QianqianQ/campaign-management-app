@@ -19,10 +19,10 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
           <DashboardHeader />
           <main className="flex-1 overflow-auto">
             <div className="container mx-auto p-6 space-y-6">
-              <div className="flex flex-col space-y-4">
+              <div className="flex flex-col space-y-6">
                 {title && (
-                  <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+                  <div className="flex items-start">
+                    <h1 className="text-4xl font-bold text-gray-900 tracking-tight">{title}</h1>
                   </div>
                 )}
                 {children}

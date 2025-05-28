@@ -87,59 +87,52 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
     }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Create Campaign</h2>
-          <p className="text-muted-foreground">Set up a new advertising campaign with payouts</p>
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Megaphone className="h-5 w-5" />
+    <div className="container mx-auto p-6 space-y-6">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8 h-full">
+        <Card className="shadow-lg">
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <Megaphone className="h-6 w-6" />
               Campaign Information
             </CardTitle>
-            <CardDescription>Enter the basic details for your campaign</CardDescription>
+            <CardDescription className="text-base">Enter the basic details for your campaign</CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6 px-8">
 
             {/* Title  */}
-            <div className="space-y-2">
-              <Label htmlFor="title">
+            <div className="space-y-3">
+              <Label htmlFor="title" className="text-base font-medium">
                 Title <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="title"
                 {...register("title")}
                 placeholder="Enter campaign title"
-                className={errors.title ? "border-red-500" : ""}
+                className={`h-12 text-base ${errors.title ? "border-red-500" : ""}`}
               />
               {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
             </div>
 
             {/* Landing Page URL */}
-            <div className="space-y-2">
-              <Label htmlFor="landingPageUrl">
+            <div className="space-y-3">
+              <Label htmlFor="landingPageUrl" className="text-base font-medium">
                 Landing Page URL <span className="text-red-500">*</span>
               </Label>
               <div className="relative">
-                <Link className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Link className="absolute left-4 top-3.5 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="landingPageUrl"
                   {...register("landing_page_url")}
                   placeholder="https://example.com/landing"
-                  className={`pl-9 ${errors.landing_page_url ? "border-red-500" : ""}`}
+                  className={`pl-12 h-12 text-base ${errors.landing_page_url ? "border-red-500" : ""}`}
                 />
               </div>
               {errors.landing_page_url && <p className="text-sm text-red-500">{errors.landing_page_url.message}</p>}
             </div>
 
             {/* Start Campaign option */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 py-2">
               <Controller
                 name="is_running"
                 control={control}
@@ -151,8 +144,8 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                   />
                 )}
               />
-              <Label htmlFor="isRunning" className="flex items-center gap-2">
-                <Globe className="h-4 w-4" />
+              <Label htmlFor="isRunning" className="flex items-center gap-3 text-base font-medium">
+                <Globe className="h-5 w-5" />
                 Start Campaign once created (You could start it later)
               </Label>
             </div>
@@ -160,31 +153,31 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
         </Card>
 
         {/* Payouts */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5" />
+        <Card className="shadow-lg flex-1">
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <DollarSign className="h-6 w-6" />
               Payouts
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Set payout amounts for different countries. At least one payout is required.
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6 px-8 flex-1">
             {/* No payouts added yet */}
             {fields.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <DollarSign className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No payouts added yet</p>
-                <p className="text-sm">{"Click \"Add Payout\" to get started"}</p>
+              <div className="text-center py-12 text-muted-foreground">
+                <DollarSign className="h-16 w-16 mx-auto mb-6 opacity-50" />
+                <p className="text-lg">No payouts added yet</p>
+                <p className="text-base">{"Click \"Add Payout\" to get started"}</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {fields.map((payout, index) => (
-                  <div key={payout.id} className="flex items-end gap-3 p-4 border rounded-lg">
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor={`country-${payout.id}`}>Country</Label>
+                  <div key={payout.id} className="flex items-end gap-4 p-6 border rounded-lg bg-white shadow-sm">
+                    <div className="flex-1 space-y-3">
+                      <Label htmlFor={`country-${payout.id}`} className="text-base font-medium">Country</Label>
                       <Controller
                         name={`payouts.${index}.country`}
                         control={control}
@@ -193,7 +186,7 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                             value={field.value === null ? 'Worldwide' : field.value || 'Worldwide'}
                             onValueChange={(value) => field.onChange(value === 'Worldwide' ? null : value)}
                           >
-                            <SelectTrigger className={errors.payouts?.[index]?.country ? "border-red-500" : ""}>
+                            <SelectTrigger className={`h-12 text-base ${errors.payouts?.[index]?.country ? "border-red-500" : ""}`}>
                               <SelectValue placeholder="Select country" />
                             </SelectTrigger>
                             <SelectContent>
@@ -210,10 +203,10 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                         <p className="text-sm text-red-500">{errors.payouts[index]?.country?.message}</p>
                       )}
                     </div>
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor={`amount-${payout.id}`}>Amount (USD)</Label>
+                    <div className="flex-1 space-y-3">
+                      <Label htmlFor={`amount-${payout.id}`} className="text-base font-medium">Amount (USD)</Label>
                       <div className="relative">
-                        <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+                        <span className="absolute left-4 top-3.5 text-muted-foreground text-base">$</span>
                         <Input
                           id={`amount-${payout.id}`}
                           type="number"
@@ -221,7 +214,7 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                           min="0"
                           {...register(`payouts.${index}.amount`, { valueAsNumber: true })}
                           placeholder="0.00"
-                          className={`pl-7 ${errors.payouts?.[index]?.amount ? "border-red-500" : ""}`}
+                          className={`pl-8 h-12 text-base ${errors.payouts?.[index]?.amount ? "border-red-500" : ""}`}
                         />
                       </div>
                       {errors.payouts?.[index]?.amount && (
@@ -233,31 +226,31 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                       variant="outline"
                       size="icon"
                       onClick={() => remove(index)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700 h-12 w-12"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-5 w-5" />
                     </Button>
                   </div>
                 ))}
               </div>
             )}
 
-            <Button type="button" variant="outline" onClick={addPayout} className="w-full">
-              <Plus className="h-4 w-4 mr-2" />
+            <Button type="button" variant="outline" onClick={addPayout} className="w-full h-12 text-base">
+              <Plus className="h-5 w-5 mr-2" />
               Add Payout
             </Button>
 
             {errors.payouts?.message && <p className="text-sm text-red-500">{errors.payouts.message}</p>}
           </CardContent>
-          <CardFooter className="flex justify-between border-t px-6 py-4">
-            <div className="text-sm text-muted-foreground">
+          <CardFooter className="flex justify-between border-t px-8 py-6">
+            <div className="text-base text-muted-foreground">
               {fields.length} payout{fields.length !== 1 ? "s" : ""} configured
             </div>
-            <div className="flex gap-2">
-              <Button type="button" variant="outline">
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" className="h-12 px-6 text-base">
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting} className="h-12 px-8 text-base">
                 {isSubmitting ? "Creating..." : "Create Campaign"}
               </Button>
             </div>
