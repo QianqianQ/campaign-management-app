@@ -1,4 +1,4 @@
-import { Home, List } from "lucide-react";
+import { Home, Plus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 import {
@@ -20,7 +20,7 @@ interface SidebarItem {
 
 const sidebarItems: SidebarItem[] = [
   { title: 'Overview', path: '/', icon: Home },
-  { title: 'Campaigns', path: '/campaigns', icon: List },
+  { title: 'Add Campaigns', path: '/campaigns', icon: Plus },
   // { title: 'Create Campaign', path: '/campaigns/create', icon: Plus },
   // { title: 'Profile', path: '/profile', icon: User },
 ];
@@ -54,7 +54,7 @@ export function DashboardSidebar() {
                 const isActive = item.path === pathname;
                 return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton isActive={isActive} onClick={() => handleNavigate(item.path)}>
+                  <SidebarMenuButton isActive={isActive} onClick={() => handleNavigate(item.path)} className="cursor-pointer">
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
                   </SidebarMenuButton>
