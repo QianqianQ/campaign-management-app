@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import CampaignList from "@/components/CampaignList";
 import CampaignSearch from "@/components/CampaignSearch";
 import { Campaign, CampaignSearchFilters } from "@/lib/api/campaigns";

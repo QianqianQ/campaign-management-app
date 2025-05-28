@@ -1,6 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CampaignSearchFilters } from '@/lib/api/campaigns';
 
 interface CampaignSearchProps {
@@ -30,15 +34,15 @@ export default function CampaignSearch({ onSearch, onClear, loading }: CampaignS
     onSearch(filters);
   };
 
-  const handleClear = () => {
-    setSearchForm({
-      title: '',
-      landing_page_url: '',
-      is_running: undefined,
-      search: ''
-    });
-    onClear();
-  };
+  // const handleClear = () => {
+  //   setSearchForm({
+  //     title: '',
+  //     landing_page_url: '',
+  //     is_running: undefined,
+  //     search: ''
+  //   });
+  //   onClear();
+  // };
 
   const handleChange = (field: keyof CampaignSearchFilters, value: string | boolean | null) => {
     setSearchForm(prev => ({
@@ -48,97 +52,73 @@ export default function CampaignSearch({ onSearch, onClear, loading }: CampaignS
   };
 
   return (
-    <div className="campaign-search bg-gray-50 p-6 rounded-lg mb-6">
-      <h3 className="text-lg font-semibold mb-4">Search Campaigns</h3>
-
+    <div className="w-full mb-6">
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Global Search */}
-        <div>
-          <label htmlFor="search" className="block text-sm font-medium mb-1">
-            Global Search
-          </label>
-          <input
-            type="text"
-            id="search"
-            value={searchForm.search || ''}
-            onChange={(e) => handleChange('search', e.target.value)}
-            placeholder="Search across title and landing page URL..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            This will search both title and landing page URL fields
-          </p>
-        </div>
-
-        <div className="border-t pt-4">
-          <h4 className="text-md font-medium mb-3">Specific Field Filters</h4>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium mb-1">
-                Campaign Title
-              </label>
-              <input
-                type="text"
-                id="title"
-                value={searchForm.title || ''}
-                onChange={(e) => handleChange('title', e.target.value)}
-                placeholder="Search by title..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="landing_page_url" className="block text-sm font-medium mb-1">
-                Landing Page URL
-              </label>
-              <input
-                type="text"
-                id="landing_page_url"
-                value={searchForm.landing_page_url || ''}
-                onChange={(e) => handleChange('landing_page_url', e.target.value)}
-                placeholder="Search by URL..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="is_running" className="block text-sm font-medium mb-1">
-                Running Status
-              </label>
-              <select
-                id="is_running"
-                value={searchForm.is_running === null || searchForm.is_running === undefined ? '' : searchForm.is_running.toString()}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  handleChange('is_running', value === '' ? null : value === 'true');
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All</option>
-                <option value="true">Running</option>
-                <option value="false">Stopped</option>
-              </select>
-            </div>
+        {/* Search Row */}
+        <div className="flex flex-col lg:flex-row gap-3">
+          {/* Global Search */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              value={searchForm.search || ''}
+              onChange={(e) => handleChange('search', e.target.value)}
+              placeholder="Search campaigns by title or URL..."
+              className="pl-10 pr-4 py-2.5 text-base"
+            />
           </div>
-        </div>
 
-        <div className="flex gap-2 pt-4">
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md disabled:opacity-50"
-          >
-            {loading ? 'Searching...' : 'Search'}
-          </button>
+          {/* Title Filter */}
+          <div className="w-full lg:w-64">
+            <Input
+              type="text"
+              value={searchForm.title || ''}
+              onChange={(e) => handleChange('title', e.target.value)}
+              placeholder="Filter by title..."
+              className="py-2.5"
+            />
+          </div>
 
-          <button
-            type="button"
-            onClick={handleClear}
-            className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md"
-          >
-            Clear
-          </button>
+          {/* URL Filter */}
+          <div className="w-full lg:w-64">
+            <Input
+              type="text"
+              value={searchForm.landing_page_url || ''}
+              onChange={(e) => handleChange('landing_page_url', e.target.value)}
+              placeholder="Filter by URL..."
+              className="py-2.5"
+            />
+          </div>
+
+          {/* Status Filter */}
+          <div className="w-full lg:w-40">
+            <Select
+              value={searchForm.is_running === null || searchForm.is_running === undefined ? 'all' : searchForm.is_running.toString()}
+              onValueChange={(value) => {
+                handleChange('is_running', value === 'all' ? null : value === 'true');
+              }}
+            >
+              <SelectTrigger className="py-2.5">
+                <SelectValue placeholder="All statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="true">Running</SelectItem>
+                <SelectItem value="false">Paused</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-2.5"
+            >
+              <Search className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </form>
     </div>
