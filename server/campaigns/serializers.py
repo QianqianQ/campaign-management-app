@@ -32,9 +32,21 @@ class CampaignPayoutSerializer(serializers.ModelSerializer):
             "campaign": {"required": False},
         }
 
+    def to_representation(self, instance):
+        """Custom representation for country field"""
+        data = super().to_representation(instance)
+        if instance.country:
+            data["country"] = f"{instance.country.name} ({instance.country.code})"
+        else:
+            data["country"] = "Worldwide"
+        return data
+
     def validate(self, attrs):
-        campaign = attrs.get("campaign") or self.instance.campaign
-        # Skip validation during campaign creation
+        campaign = attrs.get("campaign") or (
+            self.instance.campaign if self.instance else None
+        )
+
+        # Skip validation during campaign creation when no campaign is set yet
         if not campaign:
             return attrs
 

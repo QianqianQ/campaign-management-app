@@ -1,25 +1,45 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import CampaignList from "@/components/CampaignList";
+import CampaignSearch from "@/components/CampaignSearch";
+import { Campaign, CampaignSearchFilters } from "@/lib/api/campaigns";
+import CampaignCreateForm from "@/components/CampaignCreateForm";
+import { useCampaigns } from "@/hooks/useCampaigns";
 
 export default function Dashboard() {
   const { signout, user, isAuthenticated, loading } = useAuth();
+  const [searchFilters, setSearchFilters] = useState<CampaignSearchFilters>({});
+  const { createCampaign } = useCampaigns();
   const router = useRouter();
 
   useEffect(() => {
-    // if not authenticated and not loading, redirect to signin
+    console.log('Dashboard: isAuthenticated:', isAuthenticated, 'loading:', loading);
     if (!loading && !isAuthenticated) {
-      router.push('/signin');
+      router.replace('/signin');
     }
   }, [isAuthenticated, loading, router]);
 
-  // if loading or not authenticated, show loading screen
+  // Show nothing while loading to prevent flash
   if (loading || !isAuthenticated) {
-    return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
+    return null;
+  }
+
+  const handleSearch = (filters: CampaignSearchFilters) => {
+    setSearchFilters(filters);
+  }
+
+  const handleClearSearch = () => {
+    setSearchFilters({});
+  }
+
+  const handleCreateCampaign = async (campaign: Partial<Campaign>) => {
+    console.log(campaign);
+    await createCampaign(campaign);
   }
 
   return (
@@ -35,6 +55,9 @@ export default function Dashboard() {
           <p className="text-lg">Logged in as: {user?.email || "Unknown"}</p>
         </CardContent>
       </Card>
+      <CampaignSearch onSearch={handleSearch} onClear={handleClearSearch} />
+      <CampaignList searchFilters={searchFilters} />
+      <CampaignCreateForm onSubmit={handleCreateCampaign} />
     </div>
   );
 }
