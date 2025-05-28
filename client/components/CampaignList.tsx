@@ -56,8 +56,8 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
 
     const matchesStatus =
       statusFilter === "all" ||
-      (statusFilter === "Running" && campaign.is_running) ||
-      (statusFilter === "Stopped" && !campaign.is_running)
+      (statusFilter === "running" && campaign.is_running) ||
+      (statusFilter === "stopped" && !campaign.is_running)
 
     return matchesSearch && matchesStatus;
   })
