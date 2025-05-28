@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpDown, Filter, MoreHorizontal, Plus, Search, SlidersHorizontal, RefreshCw } from "lucide-react";
+import { ArrowUpDown, Filter, MoreHorizontal, Plus, Search, SlidersHorizontal, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { CampaignSearchFilters } from "@/lib/api/campaigns";
@@ -39,14 +40,43 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
     error,
     fetchCampaigns,
     handleToggleCampaignRunning,
+    deleteCampaign,
   } = useCampaigns();
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [sortBy, setSortBy] = useState<string>("newest")
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [campaignToDelete, setCampaignToDelete] = useState<{ id: number } | null>(null)
 
   useEffect(() => {
     fetchCampaigns(searchFilters);
   }, [searchFilters, fetchCampaigns]);
+
+  // Handle delete campaign
+  const handleDeleteClick = (campaignId: number) => {
+    setCampaignToDelete({ id: campaignId });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (campaignToDelete) {
+      try {
+        await deleteCampaign(campaignToDelete.id);
+        await fetchCampaigns(searchFilters); // Refresh the list
+        setDeleteDialogOpen(false);
+        setCampaignToDelete(null);
+      } catch (error) {
+        console.error('Error deleting campaign:', error);
+      }
+    }
+  };
+
+  const handleDeleteDialogOpenChange = (open: boolean) => {
+    setDeleteDialogOpen(open);
+    if (!open) {
+      setCampaignToDelete(null);
+    }
+  };
 
   // Filter campaigns based on search and status
   const filteredCampaigns = campaigns.filter((campaign) => {
@@ -291,7 +321,13 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem>Edit</DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600 focus:text-red-600"
+                              onClick={() => handleDeleteClick(campaign.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -303,6 +339,14 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
           </div>
         </CardContent>
       </Card>
+
+      <ConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onOpenChange={handleDeleteDialogOpenChange}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Campaign"
+        description="Are you sure you want to delete the campaign? This action cannot be undone and all associated payouts will also be deleted."
+      />
     </div>
   )
 }

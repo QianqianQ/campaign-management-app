@@ -65,25 +65,25 @@ export const searchCampaigns = async (filters?: CampaignSearchFilters): Promise<
 
 // Get a campaign by id
 export const getCampaignById = async (id: number): Promise<Campaign> => {
-    const response = await apiClient.get(`/campaigns/${id}`);
+    const response = await apiClient.get(`/campaigns/${id}/`);
     return response.data;
 }
 
 // Update a campaign
 export const updateCampaign = async (id: number, campaign: Campaign): Promise<Campaign> => {
-    const response = await apiClient.put(`/campaigns/${id}`, campaign);
+    const response = await apiClient.put(`/campaigns/${id}/`, campaign);
     return response.data;
 }
 
 // Partial update a campaign
 export const partialUpdateCampaign = async (id: number, campaign: Partial<Campaign>): Promise<Campaign> => {
-    const response = await apiClient.patch(`/campaigns/${id}`, campaign);
+    const response = await apiClient.patch(`/campaigns/${id}/`, campaign);
     return response.data;
 }
 
 // Delete a campaign
 export const deleteCampaign = async (id: number): Promise<void> => {
-    const response = await apiClient.delete(`/campaigns/${id}`);
+    const response = await apiClient.delete(`/campaigns/${id}/`);
     return response.data;
 }
 
