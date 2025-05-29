@@ -1,0 +1,75 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - 'server/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    paths:
+      - 'server/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    defaults:
+      run:
+        working-directory: ./server
+
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+      SECRET_KEY: test-secret-key-for-ci
+      DEBUG: false
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+
+    - name: Run linting
+      run: |
+        isort . --check-only --diff
+        black . --check --diff
+        flake8 . --select=E9,F63,F7,F82 --count --show-source --statistics
+
+    - name: Run Django checks
+      run: |
+        python manage.py check
+        python manage.py makemigrations --check --dry-run
+
+    - name: Run tests
+      run: pytest
