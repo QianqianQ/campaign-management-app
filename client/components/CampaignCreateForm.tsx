@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { Plus, Trash2, Globe, Link, Megaphone, DollarSign } from "lucide-react";
+import { Plus, Trash2, Link, Megaphone, DollarSign } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { campaignSchema, CampaignFormData } from "@/schemas/campaignSchema";
 import { Campaign } from "@/types/campaign";
 
+// TODO: Get countries and currencies from backend
 const countries = [
   { code: null, name: "Worldwide" },
   { code: "US", name: "United States" },
@@ -33,8 +34,8 @@ const countries = [
 ]
 
 const currencies = [
-  { code: "EUR", name: "Euro" },
-  { code: "USD", name: "US Dollar" },
+  { code: "EUR", name: "Euro", symbol: "€" },
+  { code: "USD", name: "US Dollar", symbol: "$" },
 ]
 
 interface CampaignCreateFormProps {
@@ -43,7 +44,7 @@ interface CampaignCreateFormProps {
   }
 
 export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps) {
-    const { register, handleSubmit, control, formState: { errors, isSubmitting }, reset } = useForm<CampaignFormData>(
+    const { register, handleSubmit, control, watch, formState: { errors, isSubmitting }, reset } = useForm<CampaignFormData>(
         {
             resolver: zodResolver(campaignSchema),
             defaultValues: {
@@ -64,6 +65,15 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
         control: control,
         name: "payouts"
     });
+
+    // Watch all payouts to get currency values
+    const watchedPayouts = watch("payouts");
+
+    // Function to get currency symbol
+    const getCurrencySymbol = (currencyCode: string) => {
+        const currency = currencies.find(c => c.code === currencyCode);
+        return currency?.symbol || "$";
+    };
 
     const addPayout = () => {
         append({
@@ -225,7 +235,7 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                             <SelectContent>
                               {currencies.map((currency) => (
                                 <SelectItem key={currency.code} value={currency.code}>
-                                  {currency.code}
+                                  {currency.symbol} {currency.code}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -240,7 +250,7 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                     <div className="flex-1 space-y-3">
                       <Label htmlFor={`amount-${payout.id}`} className="text-base font-medium">Amount</Label>
                       <div className="relative">
-                        <span className="absolute left-4 top-3.5 text-muted-foreground text-base">$</span>
+                        <span className="absolute left-4 top-3.5 text-muted-foreground text-base">{getCurrencySymbol(watchedPayouts[index]?.currency || '')}</span>
                         <Input
                           id={`amount-${payout.id}`}
                           type="number"
