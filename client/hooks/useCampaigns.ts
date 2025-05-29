@@ -42,10 +42,20 @@ export function useCampaigns() {
 
   // Toggle running status
   const handleToggleCampaignRunning = async (id: number, isRunning: boolean) => {
-    const data = await toggleCampaignRunning(id, isRunning);
-    setCampaigns(prev => prev.map(campaign =>
-      campaign.id === id ? data : campaign
-    ));
+    try {
+      const data = await toggleCampaignRunning(id, isRunning);
+      setCampaigns(prev => prev.map(campaign =>
+        campaign.id === id
+          ? { ...campaign, ...data } // Merge response with existing campaign data
+          : campaign
+      ));
+    } catch (err) {
+      const axiosError = err as AxiosError<ErrorResponse>;
+      const errorMessage = axiosError.response?.data?.detail ||
+                          axiosError.response?.data?.message ||
+                          'Failed to update campaign status';
+      setError(errorMessage);
+    }
   }
 
 

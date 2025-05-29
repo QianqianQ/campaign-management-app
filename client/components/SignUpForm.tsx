@@ -48,74 +48,75 @@ export default function SignUpForm() {
   const signUp = async (data: SignUpFormData) => {
     try {
       const response = await apiClient.post("/signup/", data);
-      console.log(response, response.status);
       if (response.status === 201) {
         router.push("/signin/");
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
-        console.log(error.response);
+        console.log("Error signing up:", error.response);
+      } else {
+        console.error("Error signing up:", error);
       }
-      console.error("Error signing up:", error);
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="john@example.com"
-                {...register("email")}
-              />
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Create a strong password"
-                {...register("password")}
-              />
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password.message}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm password</Label>
-              <Input
-                id="password_confirm"
-                type="password"
-                placeholder="Confirm your password"
-                {...register("password_confirm")}
-              />
-              {errors.password_confirm && (
-                <p className="text-sm text-red-500">{errors.password_confirm.message}</p>
-              )}
-            </div>
-            <Button type="submit" className="w-full">
-              Create account
-            </Button>
-            <div className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <a href="/signin" className="font-medium text-primary hover:underline">
-                Sign in
-              </a>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <Card className="w-full max-w-md">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="john@example.com"
+              autoComplete="email"
+              {...register("email")}
+            />
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Create a strong password"
+              autoComplete="new-password"
+              {...register("password")}
+            />
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm password</Label>
+            <Input
+              id="password_confirm"
+              type="password"
+              placeholder="Confirm your password"
+              autoComplete="new-password"
+              {...register("password_confirm")}
+            />
+            {errors.password_confirm && (
+              <p className="text-sm text-red-500">{errors.password_confirm.message}</p>
+            )}
+          </div>
+          <Button type="submit" className="w-full">
+            Create account
+          </Button>
+          <div className="text-center text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <a href="/signin" className="font-medium text-primary hover:underline">
+              Sign in
+            </a>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
