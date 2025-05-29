@@ -124,6 +124,11 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
     return countryCode ? countryCode : 'Worldwide';
   }
 
+  // Format displayed URL with ellipsis when too long
+  const formatUrl = (url: string) => {
+    return url.length > 40 ? url.substring(0, 37) + "..." : url;
+  }
+
 
   if (loading) {
     return (
@@ -257,8 +262,41 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
                       <TableCell className="font-medium">
                         <div>
                           <div className="font-medium">{campaign.title}</div>
-                          <div className="text-sm text-muted-foreground truncate max-w-[280px]">
-                            {campaign.landing_page_url}
+                          <div className="text-sm text-muted-foreground flex items-center gap-1 overflow-hidden">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-4 w-4 text-muted-foreground hover:text-foreground flex-shrink-0"
+                              onClick={() => {
+                                navigator.clipboard.writeText(campaign.landing_page_url)
+                              }}
+                              title={`${campaign.landing_page_url}`}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="h-3 w-3"
+                              >
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                              </svg>
+                            </Button>
+                            <div className="relative flex-1 min-w-0">
+                              <div
+                                className="truncate max-w-[240px] hover:bg-gray-50 rounded px-1 py-0.5 relative group"
+                                title={campaign.landing_page_url}
+                              >
+                                {formatUrl(campaign.landing_page_url)}
+                                <div className="absolute left-0 top-full mt-2 z-[9999] bg-gray-900 text-white px-3 py-2 rounded-md shadow-xl text-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none whitespace-nowrap min-w-max">
+                                  {campaign.landing_page_url}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </TableCell>
