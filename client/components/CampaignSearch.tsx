@@ -13,7 +13,7 @@ interface CampaignSearchProps {
   loading?: boolean;
 }
 
-export default function CampaignSearch({ onSearch, onClear, loading }: CampaignSearchProps) {
+export default function CampaignSearch({ onSearch, loading }: CampaignSearchProps) {
   const [searchForm, setSearchForm] = useState<CampaignSearchFilters>({
     title: '',
     landing_page_url: '',
