@@ -2,10 +2,14 @@ name: Server side CI
 
 on:
   push:
+    branches:
+      - master
     paths:
       - 'server/**'
       - '.github/workflows/server-ci.yml'
   pull_request:
+    branches:
+      - master
     paths:
       - 'server/**'
       - '.github/workflows/server-ci.yml'
