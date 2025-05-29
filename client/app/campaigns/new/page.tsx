@@ -6,12 +6,17 @@ import { Campaign } from "@/lib/api/campaigns";
 import { createCampaign } from "@/lib/api/campaigns";
 import DashboardLayout from "@/components/DashboardLayout";
 
-export default function Campaigns() {
+export default function NewCampaign() {
   const router = useRouter();
 
-const handleCreateCampaign = async (campaign: Partial<Campaign>) => {
-    await createCampaign(campaign);
-    router.push('/'); // Redirect to dashboard after successful creation
+  const handleCreateCampaign = async (campaign: Partial<Campaign>) => {
+    try {
+      await createCampaign(campaign);
+      router.push('/'); // Redirect to dashboard after successful creation
+    } catch (error) {
+      console.error('Failed to create campaign:', error);
+      // TODO: Show error message to user (e.g., toast notification)
+    }
   };
 
   return (

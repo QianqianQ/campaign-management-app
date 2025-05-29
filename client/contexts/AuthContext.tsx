@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import apiClient from '@/lib/api/client';
+import { signinApi } from '@/lib/api/auth';
 
 interface AuthContextType {
   // TODO: add type for user
@@ -62,8 +63,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // signin with email and password
   const signin = async (formData: Record<string, string>) => {
     try {
-      const res = await apiClient.post('signin/', formData);
-      const { access_token, refresh_token, user } = res.data;
+      const resData = await signinApi(formData.email, formData.password);
+      const { access_token, refresh_token, user } = resData;
 
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('refresh_token', refresh_token);
@@ -71,6 +72,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsAuthenticated(true);
       return { success: true };
     } catch (error) {
+      console.error('Error signing in:', error);
       setIsAuthenticated(false);
       if (axios.isAxiosError(error) && error.response) {
         // Server responded with error status
