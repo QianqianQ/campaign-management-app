@@ -197,7 +197,7 @@ class CampaignSerializer(serializers.ModelSerializer):
         # Remove the write_only payouts field from response
         # data.pop('payouts', None)
         # Add the actual payouts from the database
-        data['payouts'] = CampaignPayoutSerializer(
+        data["payouts"] = CampaignPayoutSerializer(
             instance.payouts.all(), many=True
         ).data
         return data
