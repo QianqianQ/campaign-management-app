@@ -191,6 +191,17 @@ class CampaignSerializer(serializers.ModelSerializer):
 
         return instance
 
+    def to_representation(self, instance):
+        """Include payouts in the response"""
+        data = super().to_representation(instance)
+        # Remove the write_only payouts field from response
+        # data.pop('payouts', None)
+        # Add the actual payouts from the database
+        data['payouts'] = CampaignPayoutSerializer(
+            instance.payouts.all(), many=True
+        ).data
+        return data
+
 
 class CampaignListSerializer(serializers.ModelSerializer):
     payouts = CampaignPayoutSerializer(many=True, read_only=True)

@@ -25,7 +25,7 @@ class AccountCreateSerializer(serializers.ModelSerializer):
     def validate_email(self, value):
         """Check if email already exists"""
         if Account.objects.filter(email=value).exists():
-            raise serializers.ValidationError("A user with this email already exists.")
+            raise serializers.ValidationError("user with this email already exists.")
         return value
 
     def validate(self, attrs):
