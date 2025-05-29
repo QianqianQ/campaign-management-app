@@ -73,7 +73,6 @@ INSTALLED_APPS = [
     "django_filters",
     "rest_framework_simplejwt",
     "corsheaders",
-    "api",
     "campaigns",
 ]
 
