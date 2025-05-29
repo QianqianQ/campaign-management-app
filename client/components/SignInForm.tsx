@@ -88,6 +88,7 @@ export default function SignInForm() {
                 id="email"
                 type="email"
                 placeholder="john@example.com"
+                autoComplete="email"
                 {...register("email")}
               />
               {errors.email && (
@@ -100,6 +101,7 @@ export default function SignInForm() {
                 id="password"
                 type="password"
                 placeholder="Enter your password"
+                autoComplete="current-password"
                 {...register("password")}
               />
               {errors.password && (

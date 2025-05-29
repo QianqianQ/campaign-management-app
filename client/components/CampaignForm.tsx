@@ -12,6 +12,7 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { campaignSchema, CampaignFormData } from "@/schemas/campaignSchema";
 import { Campaign } from "@/types/campaign";
+import { useRouter } from "next/navigation";
 
 // TODO: Get countries and currencies from backend
 const countries = [
@@ -45,6 +46,7 @@ interface CampaignCreateFormProps {
   }
 
 export default function CampaignForm({ onSubmit, initialData, isEditMode = false }: CampaignCreateFormProps) {
+    const router = useRouter();
     const { register, handleSubmit, control, watch, formState: { errors, isSubmitting }, reset } = useForm<CampaignFormData>(
         {
             resolver: zodResolver(campaignSchema),
@@ -301,7 +303,7 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
               {fields.length} payout{fields.length !== 1 ? "s" : ""} added
             </div>
             <div className="flex gap-3">
-              <Button type="button" variant="outline" className="h-12 px-6 text-base">
+              <Button type="button" variant="outline" className="h-12 px-6 text-base" onClick={() => router.push('/')}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting} className="h-12 px-8 text-base">

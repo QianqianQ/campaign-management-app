@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Plus } from "lucide-react";
+import { Home, LayoutGrid, LogOut, Plus } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 
 interface SidebarItem {
@@ -27,9 +28,12 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 export function DashboardSidebar() {
-  const { user } = useAuth();
+  const { user, signout } = useAuth();
   const pathname = usePathname();
 
+  const handleSignOut = () => {
+    signout();
+  }
   return (
     <Sidebar>
       <SidebarHeader>
@@ -62,6 +66,16 @@ export function DashboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleSignOut} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+              <LogOut className="h-4 w-4" />
+              <span>Signout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }

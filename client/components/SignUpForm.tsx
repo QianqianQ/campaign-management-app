@@ -74,6 +74,7 @@ export default function SignUpForm() {
                 id="email"
                 type="email"
                 placeholder="john@example.com"
+                autoComplete="email"
                 {...register("email")}
               />
               {errors.email && (
@@ -86,6 +87,7 @@ export default function SignUpForm() {
                 id="password"
                 type="password"
                 placeholder="Create a strong password"
+                autoComplete="new-password"
                 {...register("password")}
               />
               {errors.password && (
@@ -98,6 +100,7 @@ export default function SignUpForm() {
                 id="password_confirm"
                 type="password"
                 placeholder="Confirm your password"
+                autoComplete="new-password"
                 {...register("password_confirm")}
               />
               {errors.password_confirm && (
