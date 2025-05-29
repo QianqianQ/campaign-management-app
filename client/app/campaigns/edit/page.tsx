@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import CampaignForm from "@/components/CampaignForm";
@@ -7,7 +8,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Campaign, getCampaignById, updateCampaign } from "@/lib/api/campaigns";
 import DashboardLayout from "@/components/DashboardLayout";
 
-export default function EditCampaign() {
+function EditCampaignContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
@@ -59,33 +60,36 @@ export default function EditCampaign() {
 
   // Render loading spinner while fetching campaign
   if (loading) {
-    return (
-      <DashboardLayout title="Edit Campaign">
-        <LoadingSpinner />
-      </DashboardLayout>
-    );
+    return <LoadingSpinner />;
   }
 
   // Render error message if error or campaign is not found
   if (error || !campaign) {
     return (
-      <DashboardLayout title="Edit Campaign">
-        <div className="text-center py-8">
-          <p className="text-red-500">{error || 'Campaign not found'}</p>
-        </div>
-      </DashboardLayout>
+      <div className="text-center py-8">
+        <p className="text-red-500">{error || 'Campaign not found'}</p>
+      </div>
     );
   }
 
   return (
+    <div className="h-full w-full">
+      <CampaignForm
+        onSubmit={handleUpdateCampaign}
+        initialData={campaign}
+        isEditMode={true}
+      />
+    </div>
+  );
+}
+
+// Wrap the EditCampaignContent in a suspense boundary for SSG
+export default function EditCampaign() {
+  return (
     <DashboardLayout title="Edit Campaign">
-      <div className="h-full w-full">
-        <CampaignForm
-          onSubmit={handleUpdateCampaign}
-          initialData={campaign}
-          isEditMode={true}
-        />
-      </div>
+      <Suspense fallback={<LoadingSpinner />}>
+        <EditCampaignContent />
+      </Suspense>
     </DashboardLayout>
   );
 }
