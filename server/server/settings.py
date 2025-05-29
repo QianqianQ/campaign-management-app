@@ -75,6 +75,7 @@ REST_FRAMEWORK = {
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.OrderingFilter",
     ),
+    "EXCEPTION_HANDLER": "utils.custom_exception_handler",
 }
 
 MIDDLEWARE = [

@@ -53,7 +53,6 @@ export default function SignInForm() {
   }
 
   const onSubmit = (data: SignInFormData) => {
-    console.log(data);
     handleSignIn(data);
   }
 
@@ -62,8 +61,6 @@ export default function SignInForm() {
       const response = await signin(data);
       if (response.success) {
         router.push(returnUrl);
-      } else {
-        console.log(response.errors);
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
