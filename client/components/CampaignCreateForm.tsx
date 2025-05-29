@@ -150,8 +150,7 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                 )}
               />
               <Label htmlFor="isRunning" className="flex items-center gap-3 text-base font-medium">
-                <Globe className="h-5 w-5" />
-                Start Campaign once created (You could start it later)
+                Start Campaign immediately
               </Label>
             </div>
           </CardContent>

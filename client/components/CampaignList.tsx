@@ -21,11 +21,11 @@ import { Switch } from "@/components/ui/switch";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 import { useCampaigns } from "@/hooks/useCampaigns";
-import { CampaignSearchFilters } from "@/lib/api/campaigns";
+// import { CampaignSearchFilters } from "@/lib/api/campaigns";
 
-interface campaignListProps {
-  searchFilters: CampaignSearchFilters;
-}
+// interface campaignListProps {
+//   searchFilters: CampaignSearchFilters;
+// }
 
 // Currency symbols
 const currencySymbols: Record<string, string> = {
@@ -33,7 +33,7 @@ const currencySymbols: Record<string, string> = {
   EUR: "€",
 }
 
-export default function CampaignsList({ searchFilters = {} }: campaignListProps) {
+export default function CampaignsList() {
   const {
     campaigns,
     loading,
@@ -49,8 +49,9 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
   const [campaignToDelete, setCampaignToDelete] = useState<{ id: number } | null>(null)
 
   useEffect(() => {
-    fetchCampaigns(searchFilters);
-  }, [searchFilters, fetchCampaigns]);
+    // Fetch all campaigns without filters for frontend filtering
+    fetchCampaigns();
+  }, [fetchCampaigns]);
 
   // Handle delete campaign
   const handleDeleteClick = (campaignId: number) => {
@@ -62,7 +63,8 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
     if (campaignToDelete) {
       try {
         await deleteCampaign(campaignToDelete.id);
-        await fetchCampaigns(searchFilters); // Refresh the list
+        // await fetchCampaigns(searchFilters);
+        await fetchCampaigns(); // Refresh the list
         setDeleteDialogOpen(false);
         setCampaignToDelete(null);
       } catch (error) {
@@ -151,7 +153,7 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
             <div className="text-red-500 font-medium">Error loading campaigns</div>
             <p className="text-red-400 text-sm mt-1">{error}</p>
             <Button
-              onClick={() => fetchCampaigns(searchFilters)}
+              onClick={() => fetchCampaigns()}
               variant="outline"
               size="sm"
               className="mt-3"
@@ -169,11 +171,11 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Campaigns</h2>
+          <h1 className="text-4xl font-bold text-gray-900 tracking-tight">Campaigns</h1>
           <p className="text-muted-foreground">Manage your advertising campaigns</p>
         </div>
         <Button asChild>
-          <Link href="/campaigns/add">
+          <Link href="/campaigns/new/">
             <Plus className="h-4 w-4 mr-2" />
             New Campaign
           </Link>
@@ -238,9 +240,6 @@ export default function CampaignsList({ searchFilters = {} }: campaignListProps)
                   <TableHead className="w-[300px]">
                     <div className="flex items-center gap-1">
                       Campaign
-                      <Button variant="ghost" size="sm" className="h-8 p-0 ml-1">
-                        <ArrowUpDown className="h-3 w-3" />
-                      </Button>
                     </div>
                   </TableHead>
                   <TableHead>Status</TableHead>

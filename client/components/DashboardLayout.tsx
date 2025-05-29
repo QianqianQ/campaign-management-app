@@ -8,9 +8,10 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 interface DashboardLayoutProps {
   children: React.ReactNode;
   title?: string;
+  description?: string;
 }
 
-export default function DashboardLayout({ children, title }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, title, description }: DashboardLayoutProps) {
   return (
     <AuthGuard>
       <SidebarProvider>
@@ -24,6 +25,9 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   <div className="flex items-start">
                     <h1 className="text-4xl font-bold text-gray-900 tracking-tight">{title}</h1>
                   </div>
+                )}
+                {description && (
+                  <p className="text-muted-foreground">{description}</p>
                 )}
                 {children}
               </div>

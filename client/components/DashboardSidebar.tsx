@@ -1,5 +1,7 @@
-import { Home, Plus } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { Home, LayoutGrid, Plus } from "lucide-react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from '@/contexts/AuthContext';
 
 import {
   Sidebar,
@@ -19,29 +21,24 @@ interface SidebarItem {
 }
 
 const sidebarItems: SidebarItem[] = [
-  { title: 'Overview', path: '/', icon: Home },
-  { title: 'Add Campaigns', path: '/campaigns/add', icon: Plus },
-  // { title: 'Create Campaign', path: '/campaigns/create', icon: Plus },
+  { title: 'Overview', path: '/', icon: LayoutGrid },
+  { title: 'New Campaign', path: '/campaigns/new/', icon: Plus },
   // { title: 'Profile', path: '/profile', icon: User },
 ];
 
 export function DashboardSidebar() {
-  const router = useRouter();
+  const { user } = useAuth();
   const pathname = usePathname();
-
-  const handleNavigate = (path: string) => {
-    router.push(path);
-  }
 
   return (
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <Link href="/" className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground hover:opacity-80 transition-opacity">
             <Home className="h-4 w-4" />
-          </div>
+          </Link>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">Dashboard</span>
+            <span className="truncate font-semibold">{user ? user.email : 'Dashboard'}</span>
           </div>
         </div>
       </SidebarHeader>
@@ -50,13 +47,14 @@ export function DashboardSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {sidebarItems.map((item) => {
-                console.log(item.path, pathname);
                 const isActive = item.path === pathname;
                 return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton isActive={isActive} onClick={() => handleNavigate(item.path)} className="cursor-pointer">
+                  <SidebarMenuButton asChild isActive={isActive}>
+                    <Link href={item.path} className="cursor-pointer">
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )})}
