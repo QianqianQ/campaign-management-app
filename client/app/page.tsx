@@ -6,7 +6,7 @@ import AuthGuard from '@/components/AuthGuard';
 import Dashboard from '@/components/Dashboard';
 
 export default function Home() {
-  const { isAuthenticated, loading } = useAuth();
+  const { loading } = useAuth();
 
   // Show loading while checking authentication
   if (loading) {
@@ -14,14 +14,9 @@ export default function Home() {
   }
 
   // Show dashboard for authenticated users
-  if (isAuthenticated) {
-    return (
-      <AuthGuard>
-        <Dashboard />
-      </AuthGuard>
-    );
-  }
-
-  // Render nothing for unauthenticated users
-  return null;
+  return (
+    <AuthGuard>
+      <Dashboard />
+    </AuthGuard>
+  );
 }
