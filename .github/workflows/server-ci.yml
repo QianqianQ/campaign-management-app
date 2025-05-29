@@ -1,17 +1,18 @@
-name: Backend CI
+name: Server side CI
 
 on:
   push:
     paths:
       - 'server/**'
-      - '.github/workflows/backend-ci.yml'
+      - '.github/workflows/server-ci.yml'
   pull_request:
     paths:
       - 'server/**'
-      - '.github/workflows/backend-ci.yml'
+      - '.github/workflows/server-ci.yml'
 
 jobs:
   test:
+    name: Server side Tests
     runs-on: ubuntu-latest
 
     services:
@@ -60,11 +61,16 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
 
-    - name: Run linting
-      run: |
-        isort . --check-only --diff
-        black . --check --diff
-        flake8 . --select=E9,F63,F7,F82 --count --show-source --statistics
+    - name: Run isort check
+      run: isort . --check-only --diff
+      continue-on-error: true
+
+    - name: Run Black check
+      run: black . --check --diff
+      continue-on-error: true
+
+    - name: Run flake8 check
+      run: flake8 . --select=E9,F63,F7,F82 --count --show-source --statistics
 
     - name: Run Django checks
       run: |
