@@ -40,14 +40,24 @@ const currencies = [
 
 interface CampaignCreateFormProps {
     onSubmit: (formData: Partial<Campaign>) => Promise<void>;
-  //   onCancel: () => void;
+    initialData?: Campaign;
+    isEditMode?: boolean;
   }
 
-export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps) {
+export default function CampaignForm({ onSubmit, initialData, isEditMode = false }: CampaignCreateFormProps) {
     const { register, handleSubmit, control, watch, formState: { errors, isSubmitting }, reset } = useForm<CampaignFormData>(
         {
             resolver: zodResolver(campaignSchema),
-            defaultValues: {
+            defaultValues: initialData ? {
+                title: initialData.title,
+                landing_page_url: initialData.landing_page_url,
+                is_running: initialData.is_running,
+                payouts: initialData.payouts.map(payout => ({
+                    country: payout.country === null ? 'Worldwide' : payout.country,
+                    amount: payout.amount,
+                    currency: payout.currency,
+                })),
+            } : {
                 title: '',
                 landing_page_url: '',
                 is_running: true,
@@ -108,9 +118,9 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
           <CardHeader className="pb-6">
             <CardTitle className="flex items-center gap-3 text-xl">
               <Megaphone className="h-6 w-6" />
-              Campaign Information
+              {isEditMode ? 'Edit Campaign' : 'Campaign Information'}
             </CardTitle>
-            <CardDescription className="text-base">Enter the basic details for your campaign</CardDescription>
+            <CardDescription className="text-base">{isEditMode ? 'Update campaign details' : 'Enter the basic details for your campaign'}</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6 px-8">
@@ -295,7 +305,7 @@ export default function CampaignCreateForm({ onSubmit }: CampaignCreateFormProps
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting} className="h-12 px-8 text-base">
-                {isSubmitting ? "Creating..." : "Create Campaign"}
+                {isSubmitting ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Update Campaign" : "Create Campaign")}
               </Button>
             </div>
           </CardFooter>

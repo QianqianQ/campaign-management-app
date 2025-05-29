@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpDown, Filter, MoreHorizontal, Plus, Search, SlidersHorizontal, RefreshCw, Trash2 } from "lucide-react";
+import { Filter, MoreHorizontal, Plus, Search, SlidersHorizontal, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import { useRouter } from "next/navigation";
 
 import { useCampaigns } from "@/hooks/useCampaigns";
 // import { CampaignSearchFilters } from "@/lib/api/campaigns";
@@ -34,6 +35,7 @@ const currencySymbols: Record<string, string> = {
 }
 
 export default function CampaignsList() {
+  const router = useRouter();
   const {
     campaigns,
     loading,
@@ -356,7 +358,9 @@ export default function CampaignsList() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.push(`/campaigns/edit?id=${campaign.id}`)}>
+                              Edit
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               className="text-red-600 focus:text-red-600"
