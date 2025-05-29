@@ -1,0 +1,27 @@
+name: Deploy Django server to Render
+
+on:
+  # push:
+  #   branches:
+  #     - master
+  #   paths:
+  #     - 'server/**'  # Only trigger when backend code changes
+
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy server to Render'
+        required: true
+        default: 'master'
+
+jobs:
+  deploy:
+    name: Trigger Render Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render Deploy Hook
+        run: |
+          curl "$RENDER_DEPLOY_HOOK_URL"
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
