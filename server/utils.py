@@ -1,15 +1,21 @@
+import logging
+
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
+logger = logging.getLogger(__name__)
+
 
 def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
     # Customize DRF response format
     if response is not None:
-        print(f"Response: {response.data}")
+        logger.info(
+            f"EXCEPTION HANDLER: {type(exc).__name__}, " f"Response: {response.data}"
+        )
         custom_response_data = {
             "success": False,
             "error": response.data.get("detail", str(response.data)),
@@ -37,6 +43,10 @@ def custom_exception_handler(exc, context):
 
     # Generic server error
     return Response(
-        {"success": False, "error": "An unexpected error occurred", "status_code": 500},
+        {
+            "success": False,
+            "error": "An unexpected error occurred",
+            "status_code": 500,
+        },
         status=status.HTTP_500_INTERNAL_SERVER_ERROR,
     )

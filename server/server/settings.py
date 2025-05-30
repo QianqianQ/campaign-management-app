@@ -10,14 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import logging
+import logging.config
 import os
 from datetime import timedelta
 from pathlib import Path
-import logging
 
 from dotenv import load_dotenv
-
-logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,19 +47,12 @@ CORS_ALLOWED_ORIGINS = []
 
 if not CORS_ALLOW_ALL_ORIGINS:
     raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "")
-    CORS_ALLOWED_ORIGINS = [origin.strip()
-                            for origin in raw_origins.split(",") if origin.strip()]
+    CORS_ALLOWED_ORIGINS = [
+        origin.strip() for origin in raw_origins.split(",") if origin.strip()
+    ]
 
 DB_ENGINE = os.getenv("DB_ENGINE", "sqlite")  # sqlite | postgres
 DB_HOST_TYPE = os.getenv("DB_HOST_TYPE", "local")  # local | docker | remote
-
-logger.info(f"Loading settings for {ENV} environment")
-logger.info(f"DEBUG: {DEBUG}")
-logger.info(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
-logger.info(f"CORS_ALLOW_ALL_ORIGINS: {CORS_ALLOW_ALL_ORIGINS}")
-logger.info(f"CORS_ALLOWED_ORIGINS: {CORS_ALLOWED_ORIGINS}")
-logger.info(f"DB_ENGINE: {DB_ENGINE}")
-logger.info(f"DB_HOST_TYPE: {DB_HOST_TYPE}")
 
 # Application definition
 
@@ -197,3 +189,49 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
+
+# Logging configuration
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": (
+                "{levelname} {asctime} {module} {process:d} " "{thread:d} {message}"
+            ),
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django.request": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+}
+
+# Configure logging manually and log startup information
+logging.config.dictConfig(LOGGING)
+logger = logging.getLogger(__name__)
+logger.info(f"Loading settings for {ENV} environment")
+logger.info(f"DEBUG: {DEBUG}")
+logger.info(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+logger.info(f"CORS_ALLOW_ALL_ORIGINS: {CORS_ALLOW_ALL_ORIGINS}")
+logger.info(f"CORS_ALLOWED_ORIGINS: {CORS_ALLOWED_ORIGINS}")
+logger.info(f"DB_ENGINE: {DB_ENGINE}")
+logger.info(f"DB_HOST_TYPE: {DB_HOST_TYPE}")

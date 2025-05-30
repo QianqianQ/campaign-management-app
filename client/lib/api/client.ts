@@ -2,10 +2,32 @@ import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "ax
 import { showToast } from "@/lib/utils";
 
 interface ApiErrorResponse {
-  non_field_errors?: string[];
-  detail?: string;
   error?: string;
   [key: string]: unknown;
+}
+
+// Helper to extract all error messages from response data
+function extractErrorMsgs(data: ApiErrorResponse): string {
+  const messages: string[] = [];
+
+  // Handle each key in the response data
+  Object.entries(data).forEach(([, value]) => {
+    if (Array.isArray(value)) {
+      // Handle arrays of error messages
+      messages.push(...value.filter(msg => typeof msg === 'string'));
+    } else if (typeof value === 'string') {
+      // Handle single string messages
+      messages.push(value);
+    } else if (typeof value === 'object' && value !== null) {
+      // Recursively extract messages
+      const nestedMessages = extractErrorMsgs(value as ApiErrorResponse);
+      if (nestedMessages) {
+        messages.push(nestedMessages);
+      }
+    }
+  });
+
+  return messages.join('\n') || 'An unexpected error occurred';
 }
 
 const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api";
@@ -58,11 +80,7 @@ apiClient.interceptors.response.use(
         }
       }
     } else {
-      if (resData.non_field_errors) {
-        showToast("Error", resData.non_field_errors.join(", "));
-      } else {
-        showToast("Error", resData.detail || resData.error || "Unexpected error");
-      }
+      showToast("Error", extractErrorMsgs(resData));
     }
     return Promise.reject(error);
   }
