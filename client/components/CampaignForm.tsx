@@ -1,6 +1,4 @@
 "use client";
-
-import type React from "react";
 import { useState } from "react";
 import { Plus, Trash2, Link, Megaphone, DollarSign, Globe, MapPin } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { campaignSchema, CampaignFormData } from "@/schemas/campaignSchema";
 import { Campaign } from "@/types/campaign";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // TODO: Get countries and currencies from backend
 const countries = [
@@ -99,6 +98,13 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
     // Watch all payouts to get currency values
     const watchedPayouts = watch("payouts");
 
+    // Debug: Log form errors when they change
+    // useEffect(() => {
+    //   console.log('Form validation errors:', errors);
+    //   console.log('Form is submitting:', isSubmitting);
+    //   console.log('Current payouts:', watchedPayouts);
+    // }, [errors, isSubmitting, watchedPayouts]);
+
     // Function to get currency symbol
     const getCurrencySymbol = (currencyCode: string) => {
         const currency = currencies.find(c => c.code === currencyCode);
@@ -129,25 +135,46 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
         }
     };
 
-    const handleFormSubmit = async (data: CampaignFormData) => {
-        try {
-            // Transform "Worldwide" to null for backend
-            const transformedData = {
-                ...data,
-                payouts: data.payouts.map(payout => ({
-                    ...payout,
-                    country: payout.country === 'Worldwide' ? null : payout.country
-                }))
-            };
-            await onSubmit(transformedData as Partial<Campaign>);
-            reset();
-        } catch (error) {
-            console.error('Error creating campaign:', error);
+    // Handle form submission with error validation
+    const onFormSubmit = handleSubmit(
+        async (data: CampaignFormData) => {
+            try {
+                // Transform "Worldwide" to null for backend
+                const transformedData = {
+                    ...data,
+                    payouts: data.payouts.map(payout => ({
+                        ...payout,
+                        country: payout.country === 'Worldwide' ? null : payout.country
+                    }))
+                };
+                await onSubmit(transformedData as Partial<Campaign>);
+                reset();
+            } catch (error) {
+                console.error('Error creating campaign:', error);
+            }
+        },
+        (errors) => {
+            // Show toast for root errors
+            // console.log('Form validation failed:', errors);
+
+            const errMessage = errors.payouts?.root?.message || errors.payouts?.message ||
+            "Please fix the form errors before submitting";
+
+            toast.error(errMessage, {
+                position: "top-right",
+                duration: 5000,
+                style: {
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    color: '#dc2626',
+                },
+                className: 'border-l-4 border-l-red-500',
+            });
         }
-    }
+    );
 
   return (
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8 h-full">
+      <form onSubmit={onFormSubmit} className="space-y-8 h-full">
         <Card className="shadow-lg">
           {/* Form title */}
           <CardHeader className="pb-6">
@@ -381,8 +408,6 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
                 Add Payout
               </Button>
             )}
-
-            {errors.payouts?.message && <p className="text-sm text-red-500">{errors.payouts.message}</p>}
           </CardContent>
 
           {/* Form footer */}
