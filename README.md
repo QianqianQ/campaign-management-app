@@ -1,65 +1,95 @@
 # Campaign Management Application
 
-A tool for managing marketing campaigns
+A web application for managing marketing campaigns.
 
-## Features
-- Campaign management portal
-- Campaign creation form
-- Run/Stop campaign
-- Campaign searching
+##  🚀 Features
+- **User Authentication** - JWT authentication
+- **Campaign Management** - Campaign CRUD
+- **Campaign Dashboard** - View campaigns with search and filtering
 
-## Tech Stack
-
-### Frontend
-
-- **Library**: React
-- **Language**: TypeScript
-- **Framework**: Next.js
-- **Styling**: Tailwind CSS (+ shadcn/ui library)
-- **State** Management: Redux
-- **Routing**: React Router
-- **API**: Axios
-- **Form Handling**: react-hook-form
-- **Validation**: zod
-- **Package Manager**: npm
-
+## 🛠️ Tech Stack
 
 ### Backend
+- **Framework**: Django 5.2+ with Django REST Framework
+- **Language**: Python 3.12+
+- **Database**: PostgreSQL
+- **Authentication**: JWT
+- **API**: RESTful API with DRF
+- **Testing**: pytest + pytest-django
+- **Package Manager**: pip
 
-- **Framework**: Django 5.2.1 (Python 3.10+)
-  - No async support is required for this project, so FastAPI is not necessary
-  - Flask is also a good choice for this project. It is more lightweight and has a smaller footprint
-  - Django is a good choice for this project because it is a full-stack framework that includes a built-in ORM, a built-in admin interface, and a built-in authentication system
-  - While Django is mentioned in the job ad, and personally I'd like to enhance my skills in Django from scratch, and thus I'd like to use Django for this project
-- **Language**: Python 3.12
-- **API**: RestAPI (Django Rest Framework)
-- **ORM**: Django ORM
+### Frontend
+- **Framework**: Next.js 15.3+ (React 19.0+)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui components
+- **State Management**: React Context (AuthContext)
+- **Forms**: react-hook-form with Zod validation
+- **HTTP Client**: Axios
+- **Testing**: Jest + Playwright (E2E)
+- **Package Manager**: npm
 
-
-### Database
-
-- PostgreSQL
-  - Local development: Dockerized PostgreSQL in Docker Compose
-  - Production: Render PostgreSQL free plan: 1 GB storage, 256 MB RAM, 0.1 CPU
-  - Switch between them with environment variables
-- Caching: Redis
-
-
-### Deployment
-
-- **Containerization**: Docker
+### DevOps & Infrastructure
+- **Containerization**: Docker + Docker Compose (ongoing)
+- **Database**: sqlite3 for local development, PostgreSQL for dockerization and production
 - **CI/CD**: GitHub Actions
-- **Cloud Platform**: Azure
-- **Infrastructure as Code**: Terraform
+- **Cloud Platform**: Render (Backend) + Render (Database) + Vercel (Frontend)
+
+## 🚀 Local Development
+
+### Prerequisites
+- Node.js 22+
+- Python 3.12+
+- PostgreSQL
+
+```bash
+# Clone the repository
+git clone https://github.com/QianqianQ/campaign-management-app.git
+cd campaign-management-app
+```
+
+### Backend Setup
+```bash
+cd server
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+
+python manage.py migrate
+python manage.py runserver
+```
+
+#### Frontend Setup
+```bash
+cd client
+npm install
+npm run dev
+```
+
+## 🧪 Testing
+
+### Frontend Testing
+```bash
+cd client
+npm run test              # Unit tests with Jest
+npm run test:e2e         # E2E tests with Playwright
+```
+
+### Backend Testing
+```bash
+cd server
+pytest  # Run all tests. --cov for coverage. -v for verbose output
+```
+
+## 📝 API Endpoints
 
 
-### Security
-
-- **Authentication**: Django Built-in/JWT/OAuth2(Social Login)
-- **Security measures**: Rate Limiting, CORS
-
-
-### Testing
-
-- **Backend**: Unit Testing (pytest), Integration Testing (pytest-django, DB Testing, etc), API Testing (pytest-django)
-- **Frontend**: Unit Testing (Jest/Vitest), Integration Testing, Integration/E2E Testing (Cypress/Playwright)
+- `POST /api/signup/` - User registration
+- `POST /api/signin/` - User authentication
+- `GET /api/profile/` - Get user profile
+- `GET /api/campaigns/` - List campaigns
+- `POST /api/campaigns/` - Create campaign
+- `GET /api/campaigns/{id}/` - Get campaign details
+- `PUT /api/campaigns/{id}/` - Update campaign
+- `PATCH /api/campaigns/{id}/` - Partially update campaign
+- `DELETE /api/campaigns/{id}/` - Delete campaign
