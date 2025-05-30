@@ -13,7 +13,7 @@ A web application for managing marketing campaigns.
 - **Framework**: Django 5.2+ with Django REST Framework
 - **Language**: Python 3.12+
 - **Database**: PostgreSQL
-- **Authentication**: JWT
+- **Authentication**: JWT (stored in local storage)
 - **API**: RESTful API with DRF
 - **Testing**: pytest + pytest-django
 - **Package Manager**: pip
@@ -93,3 +93,33 @@ pytest  # Run all tests. --cov for coverage. -v for verbose output
 - `PUT /api/campaigns/{id}/` - Update campaign
 - `PATCH /api/campaigns/{id}/` - Partially update campaign
 - `DELETE /api/campaigns/{id}/` - Delete campaign
+
+
+## 🚧 Limitations & Future improvements
+
+- **Docker Setup**: Docker Compose configuration exists while not in use currently
+- **Security Considerations**:
+  - JWT tokens stored in localStorage. Should migrate to httpOnly cookies
+  - Rate limiting not implemented
+- **Testing Coverage**:
+  - Backend unit tests and integration tests, Frontend unit tests, E2E tests are required to be improved
+- **Error Handling**: Edge cases in API error responses need improvement
+- **Performance**: No caching strategy implemented yet
+
+### Possible improvements
+
+#### Security
+- Implement JWT refresh token strategy
+- Improve input validation and sanitization
+- Set up proper logging and monitoring
+- Implement backup and disaster recovery procedures
+- Add API rate limiting
+- More...
+
+#### Performance & Scalability
+- Implement Redis caching for frequently accessed data if needed
+- Imrpove database query performance
+- Set up CDN for static assets
+- Implement lazy loading for large campaign lists
+- Add pagination and virtual scrolling for large lists
+- More...
