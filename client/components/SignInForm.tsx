@@ -72,7 +72,7 @@ export default function SignInForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Sign in</CardTitle>
       </CardHeader>
@@ -103,6 +103,16 @@ export default function SignInForm() {
             {errors.password && (
               <p className="text-sm text-red-500">{errors.password.message}</p>
             )}
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>Password must contain:</p>
+              <ul className="list-disc list-inside space-y-0.5 ml-2">
+                <li>At least 8 characters</li>
+                <li>One uppercase letter (A-Z)</li>
+                <li>One lowercase letter (a-z)</li>
+                <li>One number (0-9)</li>
+                <li>One special character (!@#$%^&*)</li>
+              </ul>
+            </div>
           </div>
           <Button type="submit" className="w-full">
             Sign in
