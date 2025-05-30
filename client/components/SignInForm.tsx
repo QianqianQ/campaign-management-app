@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import LoadingSpinner from "./LoadingSpinner";
 
 const signInSchema = z.object({
@@ -36,6 +36,7 @@ export default function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signin, isAuthenticated, loading } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema)
   });
@@ -57,6 +58,7 @@ export default function SignInForm() {
   }
 
   const handleSignIn = async (data: SignInFormData) => {
+    setIsSubmitting(true);
     try {
       const response = await signin(data);
       if (response.success) {
@@ -68,6 +70,8 @@ export default function SignInForm() {
       } else {
         console.error("Error signing in:", error);
       }
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -85,6 +89,7 @@ export default function SignInForm() {
               type="email"
               placeholder="john@example.com"
               autoComplete="email"
+              disabled={isSubmitting}
               {...register("email")}
             />
             {errors.email && (
@@ -98,6 +103,7 @@ export default function SignInForm() {
               type="password"
               placeholder="Enter your password"
               autoComplete="current-password"
+              disabled={isSubmitting}
               {...register("password")}
             />
             {errors.password && (
@@ -114,8 +120,18 @@ export default function SignInForm() {
               </ul>
             </div>
           </div>
-          <Button type="submit" className="w-full">
-            Sign in
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <div className="flex items-center gap-2">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing in...
+              </div>
+            ) : (
+              "Sign in"
+            )}
           </Button>
           <div className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
