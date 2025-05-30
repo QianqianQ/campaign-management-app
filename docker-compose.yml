@@ -9,7 +9,7 @@ services:
       - "8000:8000"
     env_file:
       - ./server/.env
-      - ./server/.env.override
+      - ./server/.env.production
     networks:
       - app-network
     restart: unless-stopped

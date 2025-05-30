@@ -13,39 +13,54 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import logging
 
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables
-load_dotenv(BASE_DIR / ".env")
+# Pick which .env file to load based on ENV var
+ENV = os.getenv("ENV", "local")  # Default to 'local'
 
-# Determine which database environment to use (local | docker | remote)
-DB_HOST_TYPE = os.environ.get("DB_HOST_TYPE", "local")
-if DB_HOST_TYPE == "remote":
-    # Load overrides for remote db
-    override = BASE_DIR / ".env.override"
-    if override.exists():
-        load_dotenv(dotenv_path=override, override=True)
+# Load environment variables
+env_file = BASE_DIR / f".env.{ENV}"  # .local, .docker, .production
+if env_file.exists():
+    load_dotenv(dotenv_path=env_file)
+else:
+    load_dotenv(BASE_DIR / ".env")  # fallback
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-@@92jd8*a!$q&7=6mr0l-ep1wdcn&=954-52wakp-!6a8ry_k_"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Temporarily set to True for development
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
-CORS_ALLOW_ALL_ORIGINS = True  # TODO: Remove in production
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:3000',
-#     'http://127.0.0.1:3000',
-# ]
 
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
+CORS_ALLOWED_ORIGINS = []
+
+if not CORS_ALLOW_ALL_ORIGINS:
+    raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "")
+    CORS_ALLOWED_ORIGINS = [origin.strip()
+                            for origin in raw_origins.split(",") if origin.strip()]
+
+DB_ENGINE = os.getenv("DB_ENGINE", "sqlite")  # sqlite | postgres
+DB_HOST_TYPE = os.getenv("DB_HOST_TYPE", "local")  # local | docker | remote
+
+logger.info(f"Loading settings for {ENV} environment")
+logger.info(f"DEBUG: {DEBUG}")
+logger.info(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+logger.info(f"CORS_ALLOW_ALL_ORIGINS: {CORS_ALLOW_ALL_ORIGINS}")
+logger.info(f"CORS_ALLOWED_ORIGINS: {CORS_ALLOWED_ORIGINS}")
+logger.info(f"DB_ENGINE: {DB_ENGINE}")
+logger.info(f"DB_HOST_TYPE: {DB_HOST_TYPE}")
 
 # Application definition
 
@@ -111,32 +126,27 @@ WSGI_APPLICATION = "server.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB", "app_db"),
-        "USER": os.getenv("POSTGRES_USER", "postgres"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "postgres"),
-        "PORT": os.getenv("POSTGRES_PORT", "5432"),
-        "OPTIONS": {
-            "sslmode": "require" if DB_HOST_TYPE == "remote" else "prefer",
-        },
+if DB_ENGINE == "sqlite":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
-
-# Set the HOST based on the db host type
-if DB_HOST_TYPE == "local":
-    DATABASES["default"]["HOST"] = "localhost"
-elif DB_HOST_TYPE == "docker":
-    DATABASES["default"][
-        "HOST"
-    ] = "db"  # This should match your service name in docker-compose
-elif DB_HOST_TYPE == "remote":
-    DATABASES["default"]["HOST"] = os.environ.get("POSTGRES_HOST")
 else:
-    raise Exception(f"Unknown DB_HOST_TYPE: {DB_HOST_TYPE}")
-
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB", "app_db"),
+            "USER": os.getenv("POSTGRES_USER", "postgres"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD", "postgres"),
+            "PORT": os.getenv("POSTGRES_PORT", "5432"),
+            "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+            "OPTIONS": {
+                "sslmode": os.getenv("POSTGRES_SSLMODE", "prefer"),
+            },
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

@@ -22,7 +22,8 @@ services:
       context: ./client
       dockerfile: Dockerfile.dev
       args:
-        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}  # This pulls from .env file or env var settings
+        # NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}  # This pulls from .env file or env var settings
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api  # This pulls from .env file or env var settings
     volumes:
       - ./client:/app  # Mounts local frontend folder for development
       - /app/node_modules  # Prevents overwriting node_modules for development
@@ -30,8 +31,8 @@ services:
     ports:
       - "3000:3000"
     # command: npm run dev
-    env_file:
-      - ./client/.env.local
+    # env_file:
+    #   - ./client/.env.local
     networks:
       - app-network
     restart: unless-stopped
