@@ -1,4 +1,4 @@
-name: Client side CI
+name: Client CI
 
 on:
   push:
