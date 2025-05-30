@@ -41,7 +41,6 @@ export default function SignUpForm() {
   })
 
   const onSubmit = (data: SignUpFormData) => {
-    console.log(data);
     signUp(data);
   }
 
@@ -53,7 +52,7 @@ export default function SignUpForm() {
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
-        console.log("Error signing up:", error.response);
+        console.error("Error signing up:", error.response);
       } else {
         console.error("Error signing up:", error);
       }
