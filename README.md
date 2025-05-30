@@ -2,6 +2,10 @@
 
 A web application for managing marketing campaigns.
 
+Online Demo: https://campaign-management-app-gilt.vercel.app/
+
+You could create an account with a fake email for testing
+
 ##  🚀 Features
 - **User Authentication** - JWT authentication
 - **Campaign Management** - Campaign CRUD
