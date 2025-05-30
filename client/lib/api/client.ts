@@ -1,6 +1,13 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { showToast } from "@/lib/utils";
 
+interface ApiErrorResponse {
+  non_field_errors?: string[];
+  detail?: string;
+  error?: string;
+  [key: string]: unknown;
+}
+
 const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api";
 
 const apiClient = axios.create({
@@ -41,7 +48,7 @@ apiClient.interceptors.response.use(
   },
   (error: AxiosError) => {
     const errRes = error.response;
-    const resData: any = errRes?.data;
+    const resData = errRes?.data as ApiErrorResponse;
     if (errRes?.status === 401) {
       if (typeof window !== 'undefined') {
         // Handle unauthorized error
