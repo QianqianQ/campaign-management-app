@@ -130,7 +130,6 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
     };
 
     const handleFormSubmit = async (data: CampaignFormData) => {
-        console.log(data);
         try {
             // Transform "Worldwide" to null for backend
             const transformedData = {

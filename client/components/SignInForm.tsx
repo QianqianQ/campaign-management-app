@@ -64,7 +64,7 @@ export default function SignInForm() {
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
-        console.log("Error signing in:", error.response);
+        console.error("Error signing in:", error.response);
       } else {
         console.error("Error signing in:", error);
       }
