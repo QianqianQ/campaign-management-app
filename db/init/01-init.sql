@@ -1,0 +1,2 @@
+--  Possible future use if any initial db setup is needed
+-- Mount init.sql file to /docker-entrypoint-initdb.d/ in docker-compose.dev.yml

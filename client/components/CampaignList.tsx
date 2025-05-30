@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Filter, MoreHorizontal, Plus, Search, SlidersHorizontal, RefreshCw, Trash2 } from "lucide-react";
+import { Filter, MoreHorizontal, Plus, Search, SlidersHorizontal, RefreshCw, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -359,6 +359,7 @@ export default function CampaignsList() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => router.push(`/campaigns/edit?id=${campaign.id}`)}>
+                              <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />

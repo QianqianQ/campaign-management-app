@@ -72,7 +72,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsAuthenticated(true);
       return { success: true };
     } catch (error) {
-      console.error('Error signing in:', error);
       setIsAuthenticated(false);
       if (axios.isAxiosError(error) && error.response) {
         // Server responded with error status

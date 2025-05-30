@@ -1,7 +1,8 @@
 "use client";
 
 import type React from "react";
-import { Plus, Trash2, Link, Megaphone, DollarSign } from "lucide-react";
+import { useState } from "react";
+import { Plus, Trash2, Link, Megaphone, DollarSign, Globe, MapPin } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,6 @@ import { useRouter } from "next/navigation";
 
 // TODO: Get countries and currencies from backend
 const countries = [
-  { code: null, name: "Worldwide" },
   { code: "US", name: "United States" },
   { code: "CA", name: "Canada" },
   { code: "GB", name: "United Kingdom" },
@@ -47,7 +47,20 @@ interface CampaignCreateFormProps {
 
 export default function CampaignForm({ onSubmit, initialData, isEditMode = false }: CampaignCreateFormProps) {
     const router = useRouter();
-    const { register, handleSubmit, control, watch, formState: { errors, isSubmitting }, reset } = useForm<CampaignFormData>(
+    // Check if initial data has any countries other than Worldwide
+    // TODO: Improve country field representation in the backend and frontend
+    const hasSpecificCountries = initialData?.payouts?.some(
+      payout => payout.country !== null && payout.country !== "Worldwide") || false;
+    const [isWorldwide, setIsWorldwide] = useState(!hasSpecificCountries);
+
+    const {
+      register,
+      handleSubmit,
+      control,
+      watch,
+      setValue,
+      formState: { errors, isSubmitting },
+      reset } = useForm<CampaignFormData>(
         {
             resolver: zodResolver(campaignSchema),
             defaultValues: initialData ? {
@@ -55,7 +68,12 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
                 landing_page_url: initialData.landing_page_url,
                 is_running: initialData.is_running,
                 payouts: initialData.payouts.map(payout => ({
-                    country: payout.country === null ? 'Worldwide' : payout.country,
+                    // If country is Worldwide, set to Worldwide, otherwise set to the country name
+                    country: payout.country === "Worldwide" || payout.country === null ?
+                    'Worldwide' :
+                    payout.country?.includes('(') ?
+                    payout.country.match(/\(([^)]+)\)/)?.[1] || payout.country :
+                    payout.country,
                     amount: payout.amount,
                     currency: payout.currency,
                 })),
@@ -89,11 +107,27 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
 
     const addPayout = () => {
         append({
-            country: 'Worldwide',
+            // If worldwide, set country to Worldwide, otherwise set to US
+            country: isWorldwide ? 'Worldwide' : 'US',
             amount: 0,
             currency: 'EUR',
         });
     }
+
+    // Handle worldwide toggle
+    const handleWorldwideToggle = (checked: boolean) => {
+        setIsWorldwide(checked);
+        if (checked) {
+            // If switching to worldwide, keep only the first payout and set it to worldwide
+            while (fields.length > 1) {
+                remove(fields.length - 1);
+            }
+            setValue('payouts.0.country', 'Worldwide');
+        } else {
+            // If switching to specific countries, set the first payout to a specific country
+            setValue('payouts.0.country', 'US');
+        }
+    };
 
     const handleFormSubmit = async (data: CampaignFormData) => {
         console.log(data);
@@ -114,9 +148,9 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
     }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8 h-full">
         <Card className="shadow-lg">
+          {/* Form title */}
           <CardHeader className="pb-6">
             <CardTitle className="flex items-center gap-3 text-xl">
               <Megaphone className="h-6 w-6" />
@@ -125,6 +159,7 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
             <CardDescription className="text-base">{isEditMode ? 'Update campaign details' : 'Enter the basic details for your campaign'}</CardDescription>
           </CardHeader>
 
+          {/* Form content */}
           <CardContent className="space-y-6 px-8">
 
             {/* Title  */}
@@ -191,6 +226,39 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
           </CardHeader>
 
           <CardContent className="space-y-6 px-8 flex-1">
+
+            {/* Worldwide/Specific Countries Toggle */}
+            {/* <div className="flex items-center space-x-3 py-4 border-t">
+              <Switch
+                id="isWorldwide"
+                checked={isWorldwide}
+                onCheckedChange={handleWorldwideToggle}
+              />
+              <Label htmlFor="isWorldwide" className="text-base font-medium">
+                {isWorldwide ? "Worldwide" : "Country-Specific"}
+              </Label>
+              <span className="text-sm text-muted-foreground">
+                {isWorldwide ? "One payout applies globally" : "Specific payouts for countries"}
+              </span>
+            </div> */}
+            <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
+              <div className="flex items-center space-x-2">
+                <Globe className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <Label htmlFor="isWorldwide" className="text-sm font-medium">
+                    Worldwide Campaign
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Target all countries with the same payout</p>
+                </div>
+              </div>
+              <Switch id="isWorldwide" checked={isWorldwide} onCheckedChange={handleWorldwideToggle} />
+            </div>
+            {isWorldwide && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4" />
+                <span>This campaign will be available worldwide</span>
+              </div>
+            )}
             {/* No payouts added yet */}
             {fields.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
@@ -203,36 +271,47 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
                 {fields.map((payout, index) => (
                   <div key={payout.id} className="flex items-end gap-4 p-6 border rounded-lg bg-white shadow-sm">
 
-                    <div className="flex-1 space-y-3">
-                      <Label htmlFor={`country-${payout.id}`} className="text-base font-medium">Country</Label>
-                      <Controller
-                        name={`payouts.${index}.country`}
-                        control={control}
-                        render={({ field }) => (
-                          <Select
-                            value={field.value === null ? 'Worldwide' : field.value || 'Worldwide'}
-                            onValueChange={(value) => field.onChange(value === 'Worldwide' ? null : value)}
-                          >
-                            <SelectTrigger className={`w-full h-12 text-base ${errors.payouts?.[index]?.country ? "border-red-500" : ""}`}>
-                              <SelectValue placeholder="Select country" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {countries.map((country) => (
-                                <SelectItem key={country.code || 'Worldwide'} value={country.code || 'Worldwide'}>
-                                  {country.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      />
+                    {/* Country Field */}
+                    <div className="flex-1">
+                      <Label className="text-sm font-medium mb-2 block">
+                        {isWorldwide ? "Target" : "Country"}
+                      </Label>
+                      {isWorldwide ? (
+                        <div className="h-10 px-3 border rounded-md bg-gray-50 flex items-center text-sm text-muted-foreground">
+                          <Globe className="h-4 w-4 mr-2" />
+                          Worldwide
+                        </div>
+                      ) : (
+                        <Controller
+                          name={`payouts.${index}.country`}
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              value={field.value || 'US'}
+                              onValueChange={(value) => field.onChange(value)}
+                            >
+                              <SelectTrigger className={`w-full h-10 ${errors.payouts?.[index]?.country ? "border-red-500" : ""}`}>
+                                <SelectValue placeholder="Select country" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {countries.map((country) => (
+                                  <SelectItem key={country.code} value={country.code}>
+                                    {country.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      )}
                       {errors.payouts?.[index]?.country && (
-                        <p className="text-sm text-red-500">{errors.payouts[index]?.country?.message}</p>
+                        <p className="text-xs text-red-500 mt-1">{errors.payouts[index]?.country?.message}</p>
                       )}
                     </div>
 
-                    <div className="flex-1 space-y-3">
-                      <Label htmlFor={`currency-${payout.id}`} className="text-base font-medium">Currency</Label>
+                    {/* Currency Field */}
+                    <div className="flex-1">
+                      <Label className="text-sm font-medium mb-2 block">Currency</Label>
                       <Controller
                         name={`payouts.${index}.currency`}
                         control={control}
@@ -241,7 +320,7 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
                             value={field.value}
                             onValueChange={(value) => field.onChange(value)}
                           >
-                            <SelectTrigger className={`w-full h-12 text-base ${errors.payouts?.[index]?.currency ? "border-red-500" : ""}`}>
+                            <SelectTrigger className={`w-full h-10 ${errors.payouts?.[index]?.currency ? "border-red-500" : ""}`}>
                               <SelectValue placeholder="Select currency" />
                             </SelectTrigger>
                             <SelectContent>
@@ -255,57 +334,70 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
                         )}
                       />
                       {errors.payouts?.[index]?.currency && (
-                        <p className="text-sm text-red-500">{errors.payouts[index]?.currency?.message}</p>
+                        <p className="text-xs text-red-500 mt-1">{errors.payouts[index]?.currency?.message}</p>
                       )}
                     </div>
 
-                    <div className="flex-1 space-y-3">
-                      <Label htmlFor={`amount-${payout.id}`} className="text-base font-medium">Amount</Label>
+                    {/* Amount Field */}
+                    <div className="flex-1">
+                      <Label className="text-sm font-medium mb-2 block">Amount</Label>
                       <div className="relative">
-                        <span className="absolute left-4 top-3.5 text-muted-foreground text-base">{getCurrencySymbol(watchedPayouts[index]?.currency || '')}</span>
+                        <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">
+                          {getCurrencySymbol(watchedPayouts[index]?.currency || '')}
+                        </span>
                         <Input
-                          id={`amount-${payout.id}`}
                           type="number"
                           step="0.01"
                           min="0"
                           {...register(`payouts.${index}.amount`, { valueAsNumber: true })}
                           placeholder="0.00"
-                          className={`pl-8 h-12 text-base ${errors.payouts?.[index]?.amount ? "border-red-500" : ""}`}
+                          className={`pl-8 h-10 ${errors.payouts?.[index]?.amount ? "border-red-500" : ""}`}
                         />
                       </div>
                       {errors.payouts?.[index]?.amount && (
-                        <p className="text-sm text-red-500">{errors.payouts[index]?.amount?.message}</p>
+                        <p className="text-xs text-red-500 mt-1">{errors.payouts[index]?.amount?.message}</p>
                       )}
                     </div>
+
+                    {/* Delete Button */}
                     <Button
                       type="button"
                       variant="outline"
                       size="icon"
                       onClick={() => remove(index)}
-                      className="text-red-500 hover:text-red-700 h-12 w-12"
+                      disabled={isWorldwide || fields.length === 1}
+                      className="text-red-500 hover:text-red-700 h-10 w-10 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Trash2 className="h-5 w-5" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
               </div>
             )}
 
-            <Button type="button" variant="outline" onClick={addPayout} className="w-full h-12 text-base">
-              <Plus className="h-5 w-5 mr-2" />
-              Add Payout
-            </Button>
+            {/* Add Payout button - hidden in worldwide mode */}
+            {!isWorldwide && (
+              <Button type="button" variant="outline" onClick={addPayout} className="w-full h-12 text-base">
+                <Plus className="h-5 w-5 mr-2" />
+                Add Payout
+              </Button>
+            )}
 
             {errors.payouts?.message && <p className="text-sm text-red-500">{errors.payouts.message}</p>}
           </CardContent>
+
+          {/* Form footer */}
           <CardFooter className="flex justify-between border-t px-8 py-6">
             <div className="text-base text-muted-foreground">
               {fields.length} payout{fields.length !== 1 ? "s" : ""} added
+              {isWorldwide && <span className="ml-2 text-blue-600">(Worldwide)</span>}
             </div>
             <div className="flex gap-3">
+              {/* Cancel button */}
               <Button type="button" variant="outline" className="h-12 px-6 text-base" onClick={() => router.push('/')}>
                 Cancel
               </Button>
+              {/* Submit button */}
               <Button type="submit" disabled={isSubmitting} className="h-12 px-8 text-base">
                 {isSubmitting ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Update Campaign" : "Create Campaign")}
               </Button>
@@ -313,6 +405,5 @@ export default function CampaignForm({ onSubmit, initialData, isEditMode = false
           </CardFooter>
         </Card>
       </form>
-    </div>
   )
 }

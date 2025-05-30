@@ -30,16 +30,6 @@ if DB_HOST_TYPE == "remote":
     if override.exists():
         load_dotenv(dotenv_path=override, override=True)
 
-print("\nEnvironment Variables:")
-print(f"DEBUG: {os.getenv('DEBUG')}")
-print(f"POSTGRES_DB: {os.getenv('POSTGRES_DB')}")
-print(f"POSTGRES_USER: {os.getenv('POSTGRES_USER')}")
-print(f"POSTGRES_PASSWORD: {'*' * 8 if os.getenv('POSTGRES_PASSWORD') else None}")
-print(f"POSTGRES_HOST: {os.getenv('POSTGRES_HOST')}")
-print(f"POSTGRES_PORT: {os.getenv('POSTGRES_PORT')}")
-print(f"DJANGO_SECRET_KEY: {'*' * 8 if os.getenv('DJANGO_SECRET_KEY') else None}")
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -73,7 +63,6 @@ INSTALLED_APPS = [
     "django_filters",
     "rest_framework_simplejwt",
     "corsheaders",
-    "api",
     "campaigns",
 ]
 
@@ -86,6 +75,7 @@ REST_FRAMEWORK = {
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.OrderingFilter",
     ),
+    "EXCEPTION_HANDLER": "utils.custom_exception_handler",
 }
 
 MIDDLEWARE = [

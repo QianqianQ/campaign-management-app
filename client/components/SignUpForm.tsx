@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 
-import apiClient from "@/services/api";
+import apiClient from "@/lib/api/client";
 
 const signUpSchema = z.object({
   email: z

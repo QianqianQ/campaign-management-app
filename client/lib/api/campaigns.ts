@@ -88,7 +88,7 @@ export const deleteCampaign = async (id: number): Promise<void> => {
 }
 
 
-// Toggile is_running status
+// Toggle is_running status
 export const toggleCampaignRunning = async (id: number, isRunning: boolean): Promise<Campaign> => {
     const response = await apiClient.patch(`/campaigns/${id}/`, { is_running: isRunning });
     return response.data;
