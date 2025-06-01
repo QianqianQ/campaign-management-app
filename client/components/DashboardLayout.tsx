@@ -4,12 +4,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
-
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-  title?: string;
-  description?: string;
-}
+import { DashboardLayoutProps } from "@/types/dashboard";
 
 export default function DashboardLayout({ children, title, description }: DashboardLayoutProps) {
   return (

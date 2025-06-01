@@ -5,13 +5,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CampaignSearchFilters } from '@/lib/api/campaigns';
-
-interface CampaignSearchProps {
-  onSearch: (params: CampaignSearchFilters) => void;
-  onClear: () => void;
-  loading?: boolean;
-}
+import { CampaignSearchFilters, CampaignSearchProps } from '@/types/campaign';
 
 export default function CampaignSearch({ onSearch, loading }: CampaignSearchProps) {
   const [searchForm, setSearchForm] = useState<CampaignSearchFilters>({

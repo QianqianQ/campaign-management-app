@@ -14,14 +14,9 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import { DashboardSidebarItem } from "@/types/dashboard";
 
-interface SidebarItem {
-  title: string;
-  path: string;
-  icon?: React.ElementType;
-}
-
-const sidebarItems: SidebarItem[] = [
+const sidebarItems: DashboardSidebarItem[] = [
   { title: 'Overview', path: '/', icon: LayoutGrid },
   { title: 'New Campaign', path: '/campaigns/new/', icon: Plus },
   // { title: 'Profile', path: '/profile', icon: User },

@@ -2,7 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import CampaignsPage from '@/app/campaigns/new/page';
 import { useAuth } from '@/contexts/AuthContext';
-import { createCampaign, Campaign, CampaignPayout } from '@/lib/api/campaigns';
+import { createCampaign } from '@/lib/api/campaigns';
+import { Campaign, CampaignPayout } from '@/types/campaign';
 
 // Mock Next.js navigation hooks to avoid router dependency issues
 jest.mock('next/navigation', () => ({
