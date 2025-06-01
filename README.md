@@ -112,12 +112,8 @@ npm run test:e2e  # E2E tests with Playwright
 ### Security Improvements
 - [ ] Migrate JWT token storage to httpOnly cookies
 - [ ] Implement JWT refresh token strategy
-- [ ] Add API rate limiting
-- [ ] Enhanced input validation and sanitization
-- [ ] Implement comprehensive logging and monitoring
 
 ### Performance & Scalability
-- [ ] Database query optimization
 - [ ] Redis caching implementation
 - [ ] CDN setup for static assets
 - [ ] Pagination and virtual scrolling for large lists

@@ -83,6 +83,14 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ),
     "EXCEPTION_HANDLER": "utils.custom_exception_handler",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "1000/hour",
+    },
 }
 
 MIDDLEWARE = [
@@ -123,6 +131,11 @@ if DB_ENGINE == "sqlite":
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
+            "OPTIONS": {
+                "timeout": 20,
+                # Better concurrency
+                "init_command": "PRAGMA journal_mode=WAL;",
+            },
         }
     }
 else:
@@ -136,17 +149,23 @@ else:
             "HOST": os.getenv("POSTGRES_HOST", "localhost"),
             "OPTIONS": {
                 "sslmode": os.getenv("POSTGRES_SSLMODE", "prefer"),
+                "connect_timeout": 10,
             },
+            "CONN_MAX_AGE": 600,
         }
     }
+
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+SESSION_SAVE_EVERY_REQUEST = False
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME":
-            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",

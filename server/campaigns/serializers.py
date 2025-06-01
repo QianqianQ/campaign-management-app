@@ -1,3 +1,14 @@
+"""
+Campaign serializers for API endpoints.
+
+This module contains serializers for Campaign and CampaignPayout models
+with optimized queries and comprehensive validation.
+"""
+
+from __future__ import annotations
+
+from typing import Any, Dict, List
+
 from django.db import transaction
 from rest_framework import serializers
 
@@ -5,6 +16,13 @@ from .models import Campaign, CampaignPayout
 
 
 class CampaignPayoutSerializer(serializers.ModelSerializer):
+    """
+    Serializer for CampaignPayout model.
+
+    Handles serialization/deserialization of campaign payout data
+    with custom validation for business rules.
+    """
+
     is_worldwide = serializers.ReadOnlyField()
     display_country = serializers.ReadOnlyField()
 
@@ -27,21 +45,42 @@ class CampaignPayoutSerializer(serializers.ModelSerializer):
             "is_worldwide",
             "display_country",
         ]
-        # campaign is not required for create action
         extra_kwargs = {
             "campaign": {"required": False},
         }
 
-    def to_representation(self, instance):
-        """Custom representation for country field"""
+    def to_representation(self, instance: CampaignPayout) -> Dict[str, Any]:
+        """
+        Custom representation for country field.
+
+        Args:
+            instance: CampaignPayout instance
+
+        Returns:
+            Serialized data with formatted country information
+        """
         data = super().to_representation(instance)
         if instance.country:
-            data["country"] = f"{instance.country.name} ({instance.country.code})"
+            country_name = instance.country.name
+            country_code = instance.country.code
+            data["country"] = f"{country_name} ({country_code})"
         else:
             data["country"] = "Worldwide"
         return data
 
-    def validate(self, attrs):
+    def validate(self, attrs: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validate payout data ensuring business rules.
+
+        Args:
+            attrs: Validated data attributes
+
+        Returns:
+            Validated attributes
+
+        Raises:
+            ValidationError: If business rules are violated
+        """
         campaign = attrs.get("campaign") or (
             self.instance.campaign if self.instance else None
         )
@@ -87,6 +126,13 @@ class CampaignPayoutSerializer(serializers.ModelSerializer):
 
 
 class CampaignSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Campaign model with nested payout creation.
+
+    Handles full CRUD operations for campaigns including
+    creation and updates with associated payouts.
+    """
+
     account = serializers.HiddenField(default=serializers.CurrentUserDefault())
     payouts = serializers.ListField(write_only=True, required=False)
 
@@ -104,39 +150,69 @@ class CampaignSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["created_at", "updated_at"]
 
-    def validate_title(self, title):
-        # Skip validation during campaign update
+    def validate_title(self, title: str) -> str:
+        """
+        Validate campaign title uniqueness per account.
+
+        Args:
+            title: Campaign title to validate
+
+        Returns:
+            Validated title
+
+        Raises:
+            ValidationError: If title already exists for the account
+        """
+        # Skip validation during campaign update if title unchanged
         if self.instance and self.instance.title == title:
             return title
 
-        # Check if a campaign with this title already exists
-        if Campaign.objects.filter(
-            account=self.context["request"].user, title=title
-        ).exists():
+        # Check if a campaign with this title already exists for the user
+        user = self.context["request"].user
+        if Campaign.objects.filter(account=user, title=title).exists():
             raise serializers.ValidationError(
                 "A campaign with this title already exists"
             )
         return title
 
-    def validate_payouts(self, payouts):
-        if not payouts or not isinstance(payouts, list):
-            raise serializers.ValidationError("At least one payout is required")
+    def validate_payouts(self, payouts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Validate payouts data structure and business rules.
 
-        # Validate each payout
-        for payout in payouts:
+        Args:
+            payouts: List of payout data dictionaries
+
+        Returns:
+            Validated payouts data
+
+        Raises:
+            ValidationError: If payouts data is invalid
+        """
+        if not payouts or not isinstance(payouts, list):
+            error_msg = "At least one payout is required"
+            raise serializers.ValidationError(error_msg)
+
+        # Validate each payout structure
+        for i, payout in enumerate(payouts):
             if not isinstance(payout, dict):
-                raise serializers.ValidationError("Each payout must be an object")
+                raise serializers.ValidationError(f"Payout {i+1} must be an object")
 
             required_fields = ["amount", "currency"]
             for field in required_fields:
                 if field not in payout:
-                    raise serializers.ValidationError(f"Payout must include {field}")
+                    raise serializers.ValidationError(
+                        f"Payout {i+1} must include {field}"
+                    )
 
             if not isinstance(payout["amount"], (int, float)):
-                raise serializers.ValidationError("Amount must be a number")
+                raise serializers.ValidationError(
+                    f"Payout {i+1} amount must be a number"
+                )
 
             if not isinstance(payout["currency"], str):
-                raise serializers.ValidationError("Currency must be a string")
+                raise serializers.ValidationError(
+                    f"Payout {i+1} currency must be a string"
+                )
 
         # Check for mixing worldwide and country-specific payouts
         has_worldwide = any(payout.get("country") is None for payout in payouts)
@@ -157,24 +233,50 @@ class CampaignSerializer(serializers.ModelSerializer):
 
         return payouts
 
-    def create(self, validated_data):
+    def create(self, validated_data: Dict[str, Any]) -> Campaign:
+        """
+        Create campaign with associated payouts.
+
+        Args:
+            validated_data: Validated campaign and payouts data
+
+        Returns:
+            Created Campaign instance
+        """
         payouts_data = validated_data.pop("payouts", [])
 
         with transaction.atomic():
             campaign = Campaign.objects.create(**validated_data)
 
-            # Create payouts
+            # Create payouts in batch for better performance
+            payout_instances = []
             for payout_data in payouts_data:
                 payout_data["campaign"] = campaign.id
-                payout_serializer = CampaignPayoutSerializer(data=payout_data)
-                payout_serializer.is_valid(raise_exception=True)
-                payout_serializer.save()
+                serializer = CampaignPayoutSerializer(data=payout_data)
+                serializer.is_valid(raise_exception=True)
+                payout_instances.append(CampaignPayout(**serializer.validated_data))
+
+            # Bulk create for better performance
+            if payout_instances:
+                CampaignPayout.objects.bulk_create(payout_instances)
+
             return campaign
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Campaign, validated_data: Dict[str, Any]) -> Campaign:
+        """
+        Update campaign and replace all payouts.
+
+        Args:
+            instance: Campaign instance to update
+            validated_data: Validated update data
+
+        Returns:
+            Updated Campaign instance
+        """
         payouts_data = validated_data.pop("payouts", [])
 
         with transaction.atomic():
+            # Update campaign fields
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
@@ -182,21 +284,32 @@ class CampaignSerializer(serializers.ModelSerializer):
             if payouts_data:
                 # Delete existing payouts
                 instance.payouts.all().delete()
-                # Update payouts
+
+                # Create new payouts
+                payout_instances = []
                 for payout_data in payouts_data:
                     payout_data["campaign"] = instance.id
-                    payout_serializer = CampaignPayoutSerializer(data=payout_data)
-                    payout_serializer.is_valid(raise_exception=True)
-                    payout_serializer.save()
+                    serializer = CampaignPayoutSerializer(data=payout_data)
+                    serializer.is_valid(raise_exception=True)
+                    payout_instances.append(CampaignPayout(**serializer.validated_data))
+
+                # Bulk create for better performance
+                if payout_instances:
+                    CampaignPayout.objects.bulk_create(payout_instances)
 
         return instance
 
-    def to_representation(self, instance):
-        """Include payouts in the response"""
+    def to_representation(self, instance: Campaign) -> Dict[str, Any]:
+        """
+        Include optimized payouts in the response.
+
+        Args:
+            instance: Campaign instance
+
+        Returns:
+            Serialized campaign data with payouts
+        """
         data = super().to_representation(instance)
-        # Remove the write_only payouts field from response
-        # data.pop('payouts', None)
-        # Add the actual payouts from the database
         data["payouts"] = CampaignPayoutSerializer(
             instance.payouts.all(), many=True
         ).data
@@ -204,6 +317,13 @@ class CampaignSerializer(serializers.ModelSerializer):
 
 
 class CampaignListSerializer(serializers.ModelSerializer):
+    """
+    Optimized serializer for campaign list view.
+
+    Includes minimal campaign data with prefetched payouts
+    for efficient list rendering.
+    """
+
     payouts = CampaignPayoutSerializer(many=True, read_only=True)
 
     class Meta:
