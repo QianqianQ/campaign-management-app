@@ -4,15 +4,15 @@ services:
       context: ./server
       dockerfile: Dockerfile.dev
     environment:
-      - DB_HOST_TYPE=docker # Use dockerized db for development
+      - ENV=docker # Use dockerized db for development
     volumes:
       - ./server:/app  # Mounts local backend folder for development
     ports:
       - "8000:8000"
     depends_on:
       - db
-    env_file:
-      - ./server/.env
+    # env_file:
+    #   - ./server/.env.docker
     networks:
       - app-network
     restart: unless-stopped
@@ -43,7 +43,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d
     env_file:
-      - ./server/.env
+      - ./server/.env.docker
     # environment:
     #   - POSTGRES_DB=${POSTGRES_DB}
     #   - POSTGRES_USER=${POSTGRES_USER}
