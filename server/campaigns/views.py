@@ -28,8 +28,10 @@ class CampaignViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
 
     def get_queryset(self):
-        return Campaign.objects.filter(account=self.request.user).prefetch_related(
-            "payouts"
+        return (
+            Campaign.objects
+            .filter(account=self.request.user)
+            .prefetch_related("payouts")
         )
 
     def get_serializer_class(self):
@@ -39,14 +41,6 @@ class CampaignViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(account=self.request.user)
-
-    def perform_destroy(self, instance):
-        # NOTE: Possible to add custom logic to handle the deletion
-        return super().perform_destroy(instance)
-
-    def partial_update(self, request, *args, **kwargs):
-        # NOTE: Possible to add custom logic to handle the partial update
-        return super().partial_update(request, *args, **kwargs)
 
 
 class CampaignPayoutViewSet(viewsets.ModelViewSet):
