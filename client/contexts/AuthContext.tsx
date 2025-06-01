@@ -5,15 +5,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import apiClient from '@/lib/api/client';
 import { signinApi } from '@/lib/api/auth';
-
-interface AuthContextType {
-  // TODO: add type for user
-  user: Record<string, string> | null;
-  signin: (formData: Record<string, string>) => Promise<{ success: boolean; errors?: Record<string, unknown> }>;
-  signout: () => void;
-  isAuthenticated: boolean;
-  loading: boolean;
-}
+import { AuthContextType } from '@/types/auth';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 

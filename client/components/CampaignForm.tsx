@@ -13,6 +13,7 @@ import { campaignSchema, CampaignFormData } from "@/schemas/campaignSchema";
 import { Campaign } from "@/types/campaign";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { CampaignCreateFormProps } from "@/types/campaign";
 
 // TODO: Get countries and currencies from backend
 const countries = [
@@ -37,12 +38,6 @@ const currencies = [
   { code: "EUR", name: "Euro", symbol: "€" },
   { code: "USD", name: "US Dollar", symbol: "$" },
 ]
-
-interface CampaignCreateFormProps {
-    onSubmit: (formData: Partial<Campaign>) => Promise<void>;
-    initialData?: Campaign;
-    isEditMode?: boolean;
-  }
 
 export default function CampaignForm({ onSubmit, initialData, isEditMode = false }: CampaignCreateFormProps) {
     const router = useRouter();

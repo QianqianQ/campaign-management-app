@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import CampaignForm from "@/components/CampaignForm";
-import { Campaign } from "@/lib/api/campaigns";
+import { Campaign } from "@/types/campaign";
 import { createCampaign } from "@/lib/api/campaigns";
 import DashboardLayout from "@/components/DashboardLayout";
 
@@ -15,7 +15,6 @@ export default function NewCampaign() {
       router.push('/'); // Redirect to dashboard after successful creation
     } catch (error) {
       console.error('Failed to create campaign:', error);
-      // TODO: Show error message to user (e.g., toast notification)
     }
   };
 

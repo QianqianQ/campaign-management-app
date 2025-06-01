@@ -10,20 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-
-interface ConfirmationDialogProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
-  title?: string;
-  description?: string;
-  confirmText?: string;
-  cancelText?: string;
-  itemName?: string;
-  itemType?: string;
-  isLoading?: boolean;
-}
+import { ConfirmationDialogProps } from "@/types/dialog";
 
 export default function ConfirmationDialog({
   isOpen,

@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import CampaignForm from "@/components/CampaignForm";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { Campaign, getCampaignById, updateCampaign } from "@/lib/api/campaigns";
+import { Campaign } from "@/types/campaign";
+import { getCampaignById, updateCampaign } from "@/lib/api/campaigns";
 import DashboardLayout from "@/components/DashboardLayout";
 
 function EditCampaignContent() {

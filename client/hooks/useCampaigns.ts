@@ -1,14 +1,13 @@
 // hooks/useCampaigns.ts - Minor updates for better error handling
 import { useState, useCallback } from 'react';
+import { Campaign, CampaignSearchFilters } from '@/types/campaign';
 import {
-  Campaign,
   getCampaigns,
-  createCampaign,
-  updateCampaign,
-  deleteCampaign,
+  createCampaign as apiCreateCampaign,
+  updateCampaign as apiUpdateCampaign,
+  deleteCampaign as apiDeleteCampaign,
   partialUpdateCampaign,
   toggleCampaignRunning,
-  CampaignSearchFilters
 } from '@/lib/api/campaigns';
 import { AxiosError } from 'axios';
 
@@ -17,12 +16,17 @@ interface ErrorResponse {
   message?: string;
 }
 
+/**
+ * Custom hook for managing campaigns state and operations
+ */
 export function useCampaigns() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch campaigns with optional filters
+  /**
+   * Fetch campaigns with optional filters
+   */
   const fetchCampaigns = useCallback(async (filters?: CampaignSearchFilters) => {
     try {
       setLoading(true);
@@ -40,8 +44,10 @@ export function useCampaigns() {
     }
   }, []);
 
-  // Toggle running status
-  const handleToggleCampaignRunning = async (id: number, isRunning: boolean) => {
+  /**
+   * Toggle campaign running status
+   */
+  const handleToggleCampaignRunning = useCallback(async (id: number, isRunning: boolean) => {
     try {
       const data = await toggleCampaignRunning(id, isRunning);
       setCampaigns(prev => prev.map(campaign =>
@@ -56,8 +62,48 @@ export function useCampaigns() {
                           'Failed to update campaign status';
       setError(errorMessage);
     }
-  }
+  }, []);
 
+  /**
+   * Create a new campaign
+   */
+  const createCampaign = useCallback(async (campaign: Partial<Campaign>) => {
+    try {
+      const newCampaign = await apiCreateCampaign(campaign);
+      setCampaigns(prev => [newCampaign, ...prev]);
+      return newCampaign;
+    } catch (err) {
+      console.error('Error creating campaign:', err);
+      throw err;
+    }
+  }, []);
+
+  /**
+   * Update an existing campaign
+   */
+  const updateCampaign = useCallback(async (id: number, campaign: Campaign) => {
+    try {
+      const updatedCampaign = await apiUpdateCampaign(id, campaign);
+      setCampaigns(prev => prev.map(c => c.id === id ? updatedCampaign : c));
+      return updatedCampaign;
+    } catch (err) {
+      console.error(`Error updating campaign ${id}:`, err);
+      throw err;
+    }
+  }, []);
+
+  /**
+   * Delete a campaign
+   */
+  const deleteCampaign = useCallback(async (id: number) => {
+    try {
+      await apiDeleteCampaign(id);
+      setCampaigns(prev => prev.filter(c => c.id !== id));
+    } catch (err) {
+      console.error(`Error deleting campaign ${id}:`, err);
+      throw err;
+    }
+  }, []);
 
   return {
     campaigns,
@@ -68,6 +114,6 @@ export function useCampaigns() {
     updateCampaign,
     deleteCampaign,
     partialUpdateCampaign,
-    handleToggleCampaignRunning
+    handleToggleCampaignRunning,
   };
 }

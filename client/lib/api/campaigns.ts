@@ -1,95 +1,131 @@
 import apiClient from "./client";
+import { Campaign, CampaignSearchFilters } from "@/types/campaign";
+import { logger } from "@/lib/utils";
 
-
-export interface Campaign {
-  id: number;
-  title: string;
-  landing_page_url: string;
-  is_running: boolean;
-  payouts: CampaignPayout[];
-  created_at: Date;
-  updated_at: Date;
-}
-
-export interface CampaignPayout {
-    id?: number;
-    campaign_id: number;
-    country: string | null; // null for worldwide
-    amount: number;
-    currency: string;
-    created_at: Date;
-    updated_at: Date;
-}
-
-export interface CampaignSearchFilters {
-    title?: string;
-    landing_page_url?: string;
-    is_running?: boolean;
-    search?: string;
-}
-
-// Create a campaign
+/**
+ * Create a new campaign
+ * @param campaign - Partial campaign data
+ * @returns Promise<Campaign> - Created campaign
+ */
 export const createCampaign = async (campaign: Partial<Campaign>): Promise<Campaign> => {
-    const response = await apiClient.post('/campaigns/', campaign);
-    return response.data;
-}
+    try {
+        const response = await apiClient.post('/campaigns/', campaign);
+        return response.data;
+    } catch (error) {
+        logger.error('Failed to create campaign:', error);
+        throw error;
+    }
+};
 
-// Get all campaigns with possible filters
+/**
+ * Get all campaigns with optional filters
+ * @param filters - Optional search filters
+ * @returns Promise<Campaign[]> - Array of campaigns
+ */
 export const getCampaigns = async (filters?: CampaignSearchFilters): Promise<Campaign[]> => {
-    const params = new URLSearchParams();
+    try {
+        const params = new URLSearchParams();
 
-    if (filters?.title) params.append('title', filters.title);
-    if (filters?.landing_page_url) params.append('landing_page_url', filters.landing_page_url);
-    if (filters?.is_running !== null && filters?.is_running !== undefined) params.append('is_running',
-        filters.is_running.toString());
-    if (filters?.search) params.append('search', filters.search);
+        if (filters?.title) params.append('title', filters.title);
+        if (filters?.landing_page_url) params.append('landing_page_url', filters.landing_page_url);
+        if (filters?.is_running !== null && filters?.is_running !== undefined) {
+            params.append('is_running', filters.is_running.toString());
+        }
+        if (filters?.search) params.append('search', filters.search);
 
-    const queryString = params.toString();
-    const url = queryString ? `/campaigns?${queryString}` : '/campaigns';
-    const response = await apiClient.get(url);
-    return response.data;
-}
+        const queryString = params.toString();
+        const url = queryString ? `/campaigns?${queryString}` : '/campaigns';
 
+        const response = await apiClient.get(url);
+        return response.data;
+    } catch (error) {
+        logger.error('Failed to fetch campaigns:', error);
+        throw error;
+    }
+};
+
+/**
+ * Search campaigns (alias for getCampaigns for backward compatibility)
+ * @param filters - Optional search filters
+ * @returns Promise<Campaign[]> - Array of campaigns
+ */
 export const searchCampaigns = async (filters?: CampaignSearchFilters): Promise<Campaign[]> => {
-    const params = new URLSearchParams();
+    return getCampaigns(filters);
+};
 
-    if (filters?.title) params.append('title', filters.title);
-    if (filters?.landing_page_url) params.append('landing_page_url', filters.landing_page_url);
-    if (filters?.is_running !== null && filters?.is_running !== undefined) params.append('is_running',
-        filters.is_running.toString());
-    if (filters?.search) params.append('search', filters.search);
-
-    const response = await apiClient.get(`/campaigns?${params.toString()}`);
-    return response.data;
-}
-
-// Get a campaign by id
+/**
+ * Get a campaign by ID
+ * @param id - Campaign ID
+ * @returns Promise<Campaign> - Campaign data
+ */
 export const getCampaignById = async (id: number): Promise<Campaign> => {
-    const response = await apiClient.get(`/campaigns/${id}/`);
-    return response.data;
-}
+    try {
+        const response = await apiClient.get(`/campaigns/${id}/`);
+        return response.data;
+    } catch (error) {
+        logger.error(`Failed to fetch campaign ${id}:`, error);
+        throw error;
+    }
+};
 
-// Update a campaign
+/**
+ * Update a campaign (full update)
+ * @param id - Campaign ID
+ * @param campaign - Complete campaign data
+ * @returns Promise<Campaign> - Updated campaign
+ */
 export const updateCampaign = async (id: number, campaign: Campaign): Promise<Campaign> => {
-    const response = await apiClient.put(`/campaigns/${id}/`, campaign);
-    return response.data;
-}
+    try {
+        const response = await apiClient.put(`/campaigns/${id}/`, campaign);
+        return response.data;
+    } catch (error) {
+        logger.error(`Failed to update campaign ${id}:`, error);
+        throw error;
+    }
+};
 
-// Partial update a campaign
+/**
+ * Partially update a campaign
+ * @param id - Campaign ID
+ * @param campaign - Partial campaign data
+ * @returns Promise<Campaign> - Updated campaign
+ */
 export const partialUpdateCampaign = async (id: number, campaign: Partial<Campaign>): Promise<Campaign> => {
-    const response = await apiClient.patch(`/campaigns/${id}/`, campaign);
-    return response.data;
-}
+    try {
+        const response = await apiClient.patch(`/campaigns/${id}/`, campaign);
+        return response.data;
+    } catch (error) {
+        logger.error(`Failed to partially update campaign ${id}:`, error);
+        throw error;
+    }
+};
 
-// Delete a campaign
+/**
+ * Delete a campaign
+ * @param id - Campaign ID
+ * @returns Promise<void>
+ */
 export const deleteCampaign = async (id: number): Promise<void> => {
-    const response = await apiClient.delete(`/campaigns/${id}/`);
-    return response.data;
-}
+    try {
+        await apiClient.delete(`/campaigns/${id}/`);
+    } catch (error) {
+        logger.error(`Failed to delete campaign ${id}:`, error);
+        throw error;
+    }
+};
 
-
-// Toggle is_running status
+/**
+ * Toggle campaign running status
+ * @param id - Campaign ID
+ * @param isRunning - New running status
+ * @returns Promise<Campaign> - Updated campaign
+ */
 export const toggleCampaignRunning = async (id: number, isRunning: boolean): Promise<Campaign> => {
-    const response = await apiClient.patch(`/campaigns/${id}/`, { is_running: isRunning });
-    return response.data;
-}
+    try {
+        const response = await apiClient.patch(`/campaigns/${id}/`, { is_running: isRunning });
+        return response.data;
+    } catch (error) {
+        logger.error(`Failed to toggle campaign ${id} status:`, error);
+        throw error;
+    }
+};
