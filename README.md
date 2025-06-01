@@ -49,6 +49,9 @@
 - Python 3.12+
 
 ### Installation
+
+#### Option 1: Without Docker
+
 1. **Clone the repository**
     ```bash
     git clone https://github.com/QianqianQ/campaign-management-app.git
@@ -74,6 +77,28 @@
 4. **Access the application**
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8000
+
+#### Option 2: With Docker
+
+1. **Clone the repository**
+    ```bash
+    git clone https://github.com/QianqianQ/campaign-management-app.git
+    cd campaign-management-app
+    ```
+2. **Run the application**
+    ```bash
+    docker compose -f docker-compose.dev.yml -p campaign-dev up --build
+    ```
+
+3. **Access the application**
+- Frontend: http://localhost or http://localhost:3000 (with hot-reloading)
+- Backend API: http://localhost:8000 (with hot-reloading)
+- Dockerized database: http://localhost:5432
+
+**NOTE**: `docker-compose.yml` is configured for a production-like environment, where:
+- local files are not mounted to the container, so changes to the code will not be reflected in the container
+- The frontend is pre-built into static files (no hot-reloading)
+- An external database (PostgreSQL) is used
 
 ## 🧪 Testing
 
