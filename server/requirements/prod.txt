@@ -1,0 +1,6 @@
+-r base.txt
+
+# Production specific
+sentry-sdk[django]==2.18.0
+whitenoise==6.8.2
+django-health-check==3.18.3
