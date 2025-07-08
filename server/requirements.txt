@@ -9,3 +9,4 @@ python-dotenv==1.1.0  # Environment variables
 django-cors-headers==4.7.0  # CORS support
 djangorestframework-simplejwt==5.5.0  # JWT authentication
 django-countries==7.6.1  # Countries support
+sentry-sdk==2.32.0  # Sentry error tracking

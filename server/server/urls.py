@@ -22,7 +22,12 @@ from django.urls import include, path
 
 from . import views
 
+# for testing sentry
+def trigger_error(request):
+    division_by_zero = 1 / 0
+
 urlpatterns = [
+    path("sentry-debug/", trigger_error),
     path("", views.index, name="index"),
     path("admin/", admin.site.urls),
     path("api/", include("accounts.urls")),
